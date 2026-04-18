@@ -1,0 +1,438 @@
+{
+  "info": {
+    "_postman_id": "1c550c65-8653-489a-9b77-60fee6de6a27",
+    "name": "ged",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "25299911"
+  },
+  "item": [
+    {
+      "name": "create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Client-Token",
+            "value": "F00d63774e015461eb2590180d98c3e1dS",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Contrato de Prestação de Serviçosx\",\r\n  \"description\": \"Contrato firmado entre as partes com validade de 12 mesesx\",\r\n  \"tags\": [\"contratox\", \"juridicox\", \"cliente-ax\"],\r\n  \"owner\": \"empresa-matrizx\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/documents",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "documents"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "update",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Client-Token",
+            "value": "F00d63774e015461eb2590180d98c3e1dS",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"id\": \"02bf0955-0f08-4178-a555-276a8d78686c\",\r\n    \"status\": \"ARCHIVED\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/documents/3fe5a86e-be0b-480a-bc5b-91bcfa5f76b7",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "documents",
+            "3fe5a86e-be0b-480a-bc5b-91bcfa5f76b7"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "delete",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Client-Token",
+            "value": "F00d63774e015461eb2590180d98c3e1dS",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"phone\": \"5519997920116\",\r\n  \"message\": \"Olá, como vai?\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/documents/02bf0955-0f08-4178-a555-276a8d78686c",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "documents",
+            "02bf0955-0f08-4178-a555-276a8d78686c"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "findById",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/documents/02bf0955-0f08-4178-a555-276a8d78686c",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "documents",
+            "02bf0955-0f08-4178-a555-276a8d78686c"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "search - sem filtros",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/documents/search",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "documents",
+            "search"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "search - busca por título (CONTAINS)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"Contrato\",\r\n    \"searchType\": \"CONTAINS\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/documents/search",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "documents",
+            "search"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "search - busca por título (STARTS_WITH)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"Contrato\",\r\n    \"searchType\": \"CONTAINS\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/documents/search",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "documents",
+            "search"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "search - filtro por status",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"status\": \"PUBLISHED\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/documents/search",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "documents",
+            "search"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "search - filtro por proprietário",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"owner\": \"user1\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/documents/search",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "documents",
+            "search"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "search - filtro por data de criação",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"createdAfter\": \"2026-04-05T00:00:00\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/documents/search",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "documents",
+            "search"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "search - filtro por tags",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"tags\": [\"contato\", \"urgente\"]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/documents/search",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "documents",
+            "search"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "search - filtros combinados",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"Contrato\",\r\n    \"status\": \"PUBLISHED\",\r\n    \"tags\": [\"contato\", \"urgente\"],\r\n    \"searchType\": \"CONTAINS\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/documents/search",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "documents",
+            "search"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "search - nenhum resultado",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"XYZ_NAO_EXISTE\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/documents/search",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "documents",
+            "search"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "search - com paginação",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/documents/search?page=0&size=10&sort=title,asc",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "documents",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            },
+            {
+              "key": "size",
+              "value": "10"
+            },
+            {
+              "key": "sort",
+              "value": "title,asc"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
