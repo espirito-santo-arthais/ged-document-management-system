@@ -15,7 +15,6 @@ import lombok.*;
 @Entity
 @Table(
 		name = "documents", 
-		comment = "Main document table", 
 		indexes = {
 				@Index(name = "idx_document_title", columnList = "title"),
 				@Index(name = "idx_document_status", columnList = "status"),

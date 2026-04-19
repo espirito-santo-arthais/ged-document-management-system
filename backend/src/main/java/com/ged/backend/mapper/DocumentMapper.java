@@ -1,5 +1,8 @@
 package com.ged.backend.mapper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ged.backend.domain.dto.document.DocumentCreateRequestDTO;
 import com.ged.backend.domain.dto.document.DocumentResponseDTO;
 import com.ged.backend.domain.dto.document.DocumentUpdateRequestDTO;
@@ -9,7 +12,7 @@ import com.ged.backend.domain.enums.DocumentStatusEnum;
 public class DocumentMapper {
 
 	private DocumentMapper() {
-		// utility class
+		// classe utilitária
 	}
 
 	// =========================
@@ -19,13 +22,22 @@ public class DocumentMapper {
 		if (dto == null) {
 			return null;
 		}
+		
+		List<String> tags = dto.getTags();
+		if (tags != null) {
+		    tags = tags.stream()
+		            .filter(tag -> tag != null && !tag.isBlank())
+		            .toList();
+		} else {
+			tags = new ArrayList<>();
+		}
 
 		return Document.builder()
 				.title(dto.getTitle())
 				.description(dto.getDescription())
 				.owner(dto.getOwner())
 				.status(DocumentStatusEnum.DRAFT) // regra de negócio
-				.tags(dto.getTags())
+				.tags(tags)
 				.build();
 	}
 
@@ -46,6 +58,14 @@ public class DocumentMapper {
 			entity.setStatus(dto.getStatus().orElse(null));
 		}
 		if (dto.getTags().isPresent()) {
+			List<String> tags = dto.getTags().get();
+			if (tags != null) {
+			    tags = tags.stream()
+			            .filter(tag -> tag != null && !tag.isBlank())
+			            .toList();
+			} else {
+				tags = new ArrayList<>();
+			}
 			entity.setTags(dto.getTags().orElse(null));
 		}
 	}
