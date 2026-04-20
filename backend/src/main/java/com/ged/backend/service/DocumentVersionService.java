@@ -103,6 +103,8 @@ public class DocumentVersionService {
 						.map(v -> v.getVersion() + 1)
 						.orElse(1);
 
+			} catch (BaseException ex) {
+				throw ex;
 			} catch (DataAccessException ex) {
 				String errorMessage = String.format(
 						"Erro de banco de dados ao preparar upload. DocumentId: %s",
@@ -227,6 +229,8 @@ public class DocumentVersionService {
 					log.error(msg);
 					throw new BadRequestException(msg);
 				}
+			} catch (BaseException ex) {
+				throw ex;
 			} catch (DataAccessException ex) {
 				String errorMessage = String.format(
 						"Erro de banco de dados ao preparar exclusão de versão. DocumentId: %s, Version: %s",

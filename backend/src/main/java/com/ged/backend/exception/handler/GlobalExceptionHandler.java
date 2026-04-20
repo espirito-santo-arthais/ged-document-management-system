@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.ged.backend.exception.BaseException;
 
@@ -54,6 +55,25 @@ public class GlobalExceptionHandler {
 				.status(400)
 				.error("Validation Error")
 				.message(message)
+				.path(request.getRequestURI())
+				.build();
+
+		return ResponseEntity.badRequest().body(response);
+	}
+
+	// TRATA TAMANHO DE UPLOAD EXCEDIDO
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ResponseEntity<ErrorResponse> handleMaxSizeException(
+			MaxUploadSizeExceededException ex,
+			HttpServletRequest request) {
+
+		log.warn("Arquivo excede o tamanho máximo permitido");
+
+		ErrorResponse response = ErrorResponse.builder()
+				.timestamp(LocalDateTime.now())
+				.status(400)
+				.error("Bad Request")
+				.message("O arquivo excede o tamanho máximo permitido")
 				.path(request.getRequestURI())
 				.build();
 
