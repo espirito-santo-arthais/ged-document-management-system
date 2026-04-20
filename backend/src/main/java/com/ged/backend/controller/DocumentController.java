@@ -28,17 +28,15 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/documents")
+@RequiredArgsConstructor
 @Tag(name = "Documentos", description = "API para gerenciamento de documentos e seus metadados")
 public class DocumentController {
 
 	private final DocumentService service;
-
-	public DocumentController(DocumentService service) {
-		this.service = service;
-	}
 
 	@PostMapping
 	@Operation(summary = "Criar novo documento", description = "Cria um novo documento com metadados.")
@@ -47,7 +45,6 @@ public class DocumentController {
 	public ResponseEntity<DocumentResponseDTO> create(
 			@Valid
 			@RequestBody DocumentCreateRequestDTO dto) {
-
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
 	}
 
@@ -60,7 +57,6 @@ public class DocumentController {
 			@PathVariable UUID id,
 			@Valid
 			@RequestBody DocumentUpdateRequestDTO dto) {
-
 		return ResponseEntity.ok(service.update(id, dto));
 	}
 
@@ -71,7 +67,6 @@ public class DocumentController {
 	public ResponseEntity<Void> delete(
 			@Parameter(description = "ID do documento", required = true)
 			@PathVariable UUID id) {
-
 		service.delete(id);
 		return ResponseEntity.noContent().build();
 	}
@@ -83,7 +78,6 @@ public class DocumentController {
 	public ResponseEntity<DocumentResponseDTO> findById(
 			@Parameter(description = "ID do documento", required = true)
 			@PathVariable UUID id) {
-
 		return ResponseEntity.ok(service.findById(id));
 	}
 
@@ -110,7 +104,6 @@ public class DocumentController {
 			@Valid
 			@RequestBody DocumentSearchDTO dto,
 			@ParameterObject Pageable pageable) {
-
 		return ResponseEntity.ok(service.search(dto, pageable));
 	}
 }

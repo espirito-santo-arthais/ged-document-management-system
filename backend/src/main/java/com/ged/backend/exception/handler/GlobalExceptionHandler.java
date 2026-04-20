@@ -5,7 +5,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.ged.backend.exception.BaseException;
 
@@ -65,6 +66,24 @@ public class GlobalExceptionHandler {
 			Exception ex,
 			HttpServletRequest request) {
 
+		// Se for BaseException "escondida", trata corretamente
+		if (ex instanceof BaseException baseEx) {
+
+			log.warn("Handled BaseException via fallback: {}", baseEx.getMessage());
+
+			ErrorResponse response = ErrorResponse.builder()
+					.timestamp(LocalDateTime.now())
+					.status(baseEx.getStatus().value())
+					.error(baseEx.getStatus().getReasonPhrase())
+					.message(baseEx.getMessage())
+					.errorCode(baseEx.getErrorCode())
+					.path(request.getRequestURI())
+					.build();
+
+			return ResponseEntity.status(baseEx.getStatus()).body(response);
+		}
+
+		// erro real inesperado
 		log.error("Unhandled exception", ex);
 
 		ErrorResponse response = ErrorResponse.builder()
