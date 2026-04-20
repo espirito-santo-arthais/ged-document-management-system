@@ -13,6 +13,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -84,7 +85,11 @@ public class Document {
 	 * Lista de tags associadas ao documento
 	 */
 	@ElementCollection(fetch = FetchType.LAZY)
-	@CollectionTable(name = "document_tags", joinColumns = @JoinColumn(name = "document_id"))
+	@CollectionTable(
+			name = "document_tags",
+			joinColumns = @JoinColumn(
+					name = "document_id",
+					foreignKey = @ForeignKey(name = "document_tags_fk_document")))
 	@Column(name = "tag")
 	@Size(max = 10, message = "Máximo de 10 tags permitidas")
 	@Singular(value = "tag")
