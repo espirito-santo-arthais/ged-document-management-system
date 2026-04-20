@@ -124,16 +124,21 @@ public class DocumentVersionController {
 			@PathVariable UUID documentId,
 			@Parameter(description = "Número da versão", example = "1")
 			@PathVariable Integer version) {
+
 		log.info("Download versão. DocumentId: {}, Version: {}", documentId, version);
 
 		try (InputStream inputStream = service.download(documentId, version)) {
+
+			// BUSCA METADATA (sem quebrar padrão)
+			var metadata = service.findVersion(documentId, version);
 
 			byte[] fileBytes = inputStream.readAllBytes();
 
 			return ResponseEntity.ok()
 					.header(HttpHeaders.CONTENT_DISPOSITION,
-							"attachment; filename=\"document-" + version + "\"")
-					.contentType(MediaType.APPLICATION_OCTET_STREAM)
+							"attachment; filename=\"" + metadata.getFileName() + "\"")
+					.contentType(MediaType.parseMediaType(metadata.getContentType()))
+					.contentLength(fileBytes.length)
 					.body(fileBytes);
 
 		} catch (BaseException ex) {

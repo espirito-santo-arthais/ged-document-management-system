@@ -1,74 +1,101 @@
 package com.ged.backend.service.storage;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ged.backend.exception.StorageException;
+
+import io.minio.GetObjectArgs;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
+import io.minio.errors.ErrorResponseException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MinIOStorageService implements StorageService {
+
+	private final MinioClient minioClient;
+
+	@Value("${MINIO_BUCKET}")
+	private String bucket;
 
 	@Override
 	public String upload(MultipartFile file) {
-		log.info("Iniciando upload de arquivo. Nome: {}", file.getOriginalFilename());
+		log.info("Upload iniciado. Nome: {}", file.getOriginalFilename());
 
 		try {
-			// Simula geração de chave única
-			String storageKey = "mock/" + UUID.randomUUID();
+			String objectName = UUID.randomUUID() + "-" + file.getOriginalFilename();
 
-			log.info("Upload simulado com sucesso. Key: {}", storageKey);
+			minioClient.putObject(
+					PutObjectArgs.builder()
+							.bucket(bucket)
+							.object(objectName)
+							.stream(file.getInputStream(), file.getSize(), -1)
+							.contentType(file.getContentType())
+							.build());
 
-			return storageKey;
+			log.info("Upload realizado com sucesso. Key: {}", objectName);
+
+			return objectName;
 
 		} catch (Exception ex) {
-			String errorMessage = String.format(
-					"Erro ao simular upload no storage. File: %s",
+			String msg = String.format("Erro ao realizar upload no MinIO. File: %s",
 					file.getOriginalFilename());
-			log.error(errorMessage, ex);
-			throw new RuntimeException(errorMessage, ex);
+			log.error(msg, ex);
+			throw new StorageException(msg, ex);
 		}
 	}
 
 	@Override
 	public InputStream download(String storageKey) {
-		log.info("Iniciando download de arquivo. Key: {}", storageKey);
+		log.info("Download iniciado. Key: {}", storageKey);
 
 		try {
-			// Simula conteúdo do arquivo
-			String fakeContent = "Arquivo simulado para key: " + storageKey;
+			return minioClient.getObject(
+					GetObjectArgs.builder()
+							.bucket(bucket)
+							.object(storageKey)
+							.build());
 
-			log.info("Download simulado com sucesso. Key: {}", storageKey);
+		} catch (ErrorResponseException ex) {
+			if (ex.errorResponse().code().equals("NoSuchKey")) {
+				throw new StorageException("Arquivo não encontrado no storage");
+			}
 
-			return new ByteArrayInputStream(fakeContent.getBytes());
+			log.error("Erro MinIO", ex);
+			throw new StorageException("Erro ao realizar download no storage", ex);
 
 		} catch (Exception ex) {
-			String errorMessage = String.format(
-					"Erro ao simular download no storage. Key: %s",
-					storageKey);
-			log.error(errorMessage, ex);
-			throw new RuntimeException(errorMessage, ex);
+			log.error("Erro inesperado no download", ex);
+			throw new StorageException("Erro ao realizar download no storage", ex);
 		}
 	}
 
 	@Override
 	public void delete(String storageKey) {
-		log.info("Iniciando exclusão de arquivo. Key: {}", storageKey);
+		log.info("Exclusão iniciada. Key: {}", storageKey);
 
 		try {
-			// Simulação apenas log
-			log.info("Exclusão simulada com sucesso. Key: {}", storageKey);
+			minioClient.removeObject(
+					RemoveObjectArgs.builder()
+							.bucket(bucket)
+							.object(storageKey)
+							.build());
+
+			log.info("Arquivo removido com sucesso. Key: {}", storageKey);
 
 		} catch (Exception ex) {
-			String errorMessage = String.format(
-					"Erro ao simular exclusão no storage. Key: %s",
-					storageKey);
-			log.error(errorMessage, ex);
-			throw new RuntimeException(errorMessage, ex);
+			String msg = String.format("Erro ao excluir arquivo no storage. Key: %s", storageKey);
+			log.error(msg, ex);
+			throw new StorageException(msg, ex);
 		}
 	}
 }
