@@ -5,7 +5,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.ged.backend.exception.BaseException;
 
@@ -59,12 +61,49 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.badRequest().body(response);
 	}
 
+	// TRATA TAMANHO DE UPLOAD EXCEDIDO
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ResponseEntity<ErrorResponse> handleMaxSizeException(
+			MaxUploadSizeExceededException ex,
+			HttpServletRequest request) {
+
+		log.warn("Arquivo excede o tamanho máximo permitido");
+
+		ErrorResponse response = ErrorResponse.builder()
+				.timestamp(LocalDateTime.now())
+				.status(400)
+				.error("Bad Request")
+				.message("O arquivo excede o tamanho máximo permitido")
+				.path(request.getRequestURI())
+				.build();
+
+		return ResponseEntity.badRequest().body(response);
+	}
+
 	// QUALQUER ERRO NÃO TRATADO
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponse> handleGeneric(
 			Exception ex,
 			HttpServletRequest request) {
 
+		// Se for BaseException "escondida", trata corretamente
+		if (ex instanceof BaseException baseEx) {
+
+			log.warn("Handled BaseException via fallback: {}", baseEx.getMessage());
+
+			ErrorResponse response = ErrorResponse.builder()
+					.timestamp(LocalDateTime.now())
+					.status(baseEx.getStatus().value())
+					.error(baseEx.getStatus().getReasonPhrase())
+					.message(baseEx.getMessage())
+					.errorCode(baseEx.getErrorCode())
+					.path(request.getRequestURI())
+					.build();
+
+			return ResponseEntity.status(baseEx.getStatus()).body(response);
+		}
+
+		// erro real inesperado
 		log.error("Unhandled exception", ex);
 
 		ErrorResponse response = ErrorResponse.builder()

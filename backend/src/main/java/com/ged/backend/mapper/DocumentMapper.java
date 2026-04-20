@@ -12,7 +12,7 @@ import com.ged.backend.domain.enums.DocumentStatusEnum;
 public class DocumentMapper {
 
 	private DocumentMapper() {
-		// classe utilitária
+		// Evita instanciação
 	}
 
 	// =========================
@@ -22,12 +22,12 @@ public class DocumentMapper {
 		if (dto == null) {
 			return null;
 		}
-		
+
 		List<String> tags = dto.getTags();
 		if (tags != null) {
-		    tags = tags.stream()
-		            .filter(tag -> tag != null && !tag.isBlank())
-		            .toList();
+			tags = tags.stream()
+					.filter(tag -> tag != null && !tag.isBlank())
+					.toList();
 		} else {
 			tags = new ArrayList<>();
 		}
@@ -60,9 +60,9 @@ public class DocumentMapper {
 		if (dto.getTags().isPresent()) {
 			List<String> tags = dto.getTags().get();
 			if (tags != null) {
-			    tags = tags.stream()
-			            .filter(tag -> tag != null && !tag.isBlank())
-			            .toList();
+				tags = tags.stream()
+						.filter(tag -> tag != null && !tag.isBlank())
+						.toList();
 			} else {
 				tags = new ArrayList<>();
 			}

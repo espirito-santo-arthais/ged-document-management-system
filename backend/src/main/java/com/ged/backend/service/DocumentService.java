@@ -15,8 +15,10 @@ import com.ged.backend.domain.dto.document.DocumentUpdateRequestDTO;
 import com.ged.backend.domain.entity.Document;
 import com.ged.backend.domain.enums.SearchTypeEnum;
 import com.ged.backend.exception.BadRequestException;
+import com.ged.backend.exception.BaseException;
 import com.ged.backend.exception.DatabaseException;
 import com.ged.backend.exception.ResourceNotFoundException;
+import com.ged.backend.exception.UnexpectedException;
 import com.ged.backend.mapper.DocumentMapper;
 import com.ged.backend.repository.DocumentRepository;
 import com.ged.backend.specification.DocumentSpecification;
@@ -45,12 +47,16 @@ public class DocumentService {
 					response.getId(), response.getTitle(), response.getStatus());
 
 			return response;
+		} catch (BaseException ex) {
+			throw ex; // mantém regra de negócio
 		} catch (DataAccessException ex) {
-			String errorMessage = String.format(
-					"Erro de banco de dados ao criar documento. Título: %s",
-					dto.getTitle());
+			String errorMessage = String.format("Erro de banco de dados ao criar documento. Título: %s", dto.getTitle());
 			log.error(errorMessage, ex);
 			throw new DatabaseException(errorMessage, ex);
+		} catch (Exception ex) {
+			String errorMessage = String.format("Erro inesperado ao criar documento. Título: %s", dto.getTitle());
+			log.error(errorMessage, ex);
+			throw new UnexpectedException(errorMessage, ex);
 		}
 	}
 
@@ -70,9 +76,7 @@ public class DocumentService {
 		}
 
 		if (!id.equals(dto.getId())) {
-			String msg = String.format(
-					"ID da URL (%s) é diferente do ID do corpo (%s)",
-					id, dto.getId());
+			String msg = String.format("ID da URL (%s) é diferente do ID do corpo (%s)", id, dto.getId());
 			log.error(msg);
 			throw new BadRequestException(msg);
 		}
@@ -95,12 +99,16 @@ public class DocumentService {
 					response.getId(), response.getTitle(), response.getStatus());
 
 			return response;
+		} catch (BaseException ex) {
+			throw ex; // mantém regra de negócio
 		} catch (DataAccessException ex) {
-			String errorMessage = String.format(
-					"Erro de banco de dados ao atualizar documento. ID: %s",
-					id);
+			String errorMessage = String.format("Erro de banco de dados ao atualizar documento. Título: %s", dto.getTitle());
 			log.error(errorMessage, ex);
 			throw new DatabaseException(errorMessage, ex);
+		} catch (Exception ex) {
+			String errorMessage = String.format("Erro inesperado ao atualizar documento. Título: %s", dto.getTitle());
+			log.error(errorMessage, ex);
+			throw new UnexpectedException(errorMessage, ex);
 		}
 	}
 
@@ -123,12 +131,16 @@ public class DocumentService {
 			repository.deleteById(id);
 
 			log.info("Documento excluído com sucesso. ID: {}", id);
+		} catch (BaseException ex) {
+			throw ex; // mantém regra de negócio
 		} catch (DataAccessException ex) {
-			String errorMessage = String.format(
-					"Erro de banco de dados ao excluir documento. ID: %s",
-					id);
+			String errorMessage = String.format("Erro de banco de dados ao excluir documento. ID: %s", id);
 			log.error(errorMessage, ex);
 			throw new DatabaseException(errorMessage, ex);
+		} catch (Exception ex) {
+			String errorMessage = String.format("Erro inesperado ao excluir documento. ID: %s", id);
+			log.error(errorMessage, ex);
+			throw new UnexpectedException(errorMessage, ex);
 		}
 	}
 
@@ -155,12 +167,16 @@ public class DocumentService {
 					response.getId(), response.getTitle(), response.getStatus());
 
 			return response;
+		} catch (BaseException ex) {
+			throw ex; // mantém regra de negócio
 		} catch (DataAccessException ex) {
-			String errorMessage = String.format(
-					"Erro de banco de dados ao buscar documento. ID: %s",
-					id);
+			String errorMessage = String.format("Erro de banco de dados ao buscar documento. ID: %s", id);
 			log.error(errorMessage, ex);
 			throw new DatabaseException(errorMessage, ex);
+		} catch (Exception ex) {
+			String errorMessage = String.format("Erro inesperado ao buscar documento. ID: %s", id);
+			log.error(errorMessage, ex);
+			throw new UnexpectedException(errorMessage, ex);
 		}
 	}
 
@@ -178,36 +194,27 @@ public class DocumentService {
 
 			// TITLE / DESCRIPTION (com SearchTypeEnum)
 			if (dto.getSearchType() == SearchTypeEnum.STARTS_WITH) {
-				spec = spec.and(
-						DocumentSpecification.titleOrDescriptionStartsWith(dto.getTitle()));
+				spec = spec.and(DocumentSpecification.titleOrDescriptionStartsWith(dto.getTitle()));
 			} else {
-				spec = spec.and(
-						DocumentSpecification.titleOrDescriptionContains(dto.getTitle()));
+				spec = spec.and(DocumentSpecification.titleOrDescriptionContains(dto.getTitle()));
 			}
 
 			// STATUS
-			spec = spec.and(
-					DocumentSpecification.statusEquals(dto.getStatus()));
+			spec = spec.and(DocumentSpecification.statusEquals(dto.getStatus()));
 
 			// OWNER
-			spec = spec.and(
-					DocumentSpecification.ownerEquals(dto.getOwner()));
+			spec = spec.and(DocumentSpecification.ownerEquals(dto.getOwner()));
 
 			// CREATED
-			spec = spec.and(
-					DocumentSpecification.createdAfter(dto.getCreatedAfter()));
-			spec = spec.and(
-					DocumentSpecification.createdBefore(dto.getCreatedBefore()));
+			spec = spec.and(DocumentSpecification.createdAfter(dto.getCreatedAfter()));
+			spec = spec.and(DocumentSpecification.createdBefore(dto.getCreatedBefore()));
 
 			// UPDATED
-			spec = spec.and(
-					DocumentSpecification.updatedAfter(dto.getUpdatedAfter()));
-			spec = spec.and(
-					DocumentSpecification.updatedBefore(dto.getUpdatedBefore()));
+			spec = spec.and(DocumentSpecification.updatedAfter(dto.getUpdatedAfter()));
+			spec = spec.and(DocumentSpecification.updatedBefore(dto.getUpdatedBefore()));
 
 			// TAGS
-			spec = spec.and(
-					DocumentSpecification.hasTags(dto.getTags()));
+			spec = spec.and(DocumentSpecification.hasTags(dto.getTags()));
 
 			Page<Document> page = repository.findAll(spec, pageable);
 
@@ -216,12 +223,16 @@ public class DocumentService {
 			log.info("Busca realizada com sucesso. Total encontrados: {}", response.getTotalElements());
 
 			return response;
+		} catch (BaseException ex) {
+			throw ex; // mantém regra de negócio
 		} catch (DataAccessException ex) {
-			String errorMessage = String.format(
-					"Erro de banco de dados ao buscar documentos. Filtros: %s",
-					dto);
+			String errorMessage = String.format("Erro de banco de dados ao buscar documentos. Filtros: %s", dto);
 			log.error(errorMessage, ex);
 			throw new DatabaseException(errorMessage, ex);
+		} catch (Exception ex) {
+			String errorMessage = String.format("Erro inesperado ao buscar documentos. Filtros: %s", dto);
+			log.error(errorMessage, ex);
+			throw new UnexpectedException(errorMessage, ex);
 		}
 	}
 }
