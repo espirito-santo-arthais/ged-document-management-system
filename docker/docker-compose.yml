@@ -33,6 +33,28 @@ services:
     volumes:
       - minio_data:/data
 
+  # 🔥 INIT CONTAINER PARA CRIAR BUCKET AUTOMATICAMENTE
+  minio-init:
+    image: minio/mc
+    container_name: ged-minio-init
+    depends_on:
+      - minio
+    env_file:
+      - ../.env
+    entrypoint: >
+      /bin/sh -c "
+      echo '⏳ Aguardando MinIO subir...';
+      sleep 5;
+      echo '🔗 Configurando cliente mc...';
+      mc alias set local http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      echo '📦 Criando bucket se não existir...';
+      mc mb local/${MINIO_BUCKET} --ignore-existing;
+      echo '🔓 Definindo política pública (opcional)...';
+      mc anonymous set public local/${MINIO_BUCKET};
+      echo '✅ MinIO pronto!';
+      exit 0;
+      "
+
 #  backend:
 #    build:
 #      context: ../backend
