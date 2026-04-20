@@ -4,20 +4,38 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()
-            );
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        return http.build();
-    }
+		http
+				// desabilita CSRF (API REST)
+				.csrf(csrf -> csrf.disable())
+
+				// sem sessão (stateless - JWT no futuro)
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+				// regras de autorização
+				.authorizeHttpRequests(auth -> auth
+						// liberar swagger
+						.requestMatchers(
+								"/swagger-ui/**",
+								"/v3/api-docs/**",
+								"/swagger-ui.html")
+						.permitAll()
+
+						// liberar auth (vamos criar depois)
+						.requestMatchers("/auth/**").permitAll()
+
+						// qualquer outra rota precisa autenticação
+						.anyRequest().permitAll());
+
+		return http.build();
+	}
 }
