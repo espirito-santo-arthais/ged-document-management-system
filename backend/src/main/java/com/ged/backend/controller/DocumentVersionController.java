@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,6 +44,8 @@ public class DocumentVersionController {
 	// =========================
 	// UPLOAD
 	// =========================
+	@PreAuthorize("hasAnyRole('ADMIN')")
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@Operation(
 			summary = "Upload de nova versão",
 			description = "Realiza o upload de um arquivo (PDF, PNG ou JPG) criando uma nova versão para o documento.")
@@ -55,7 +58,6 @@ public class DocumentVersionController {
 					@ApiResponse(responseCode = "400", description = "Arquivo inválido"),
 					@ApiResponse(responseCode = "404", description = "Documento não encontrado")
 			})
-	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<DocumentVersionResponseDTO> upload(
 			@Parameter(description = "ID do documento", required = true)
 			@PathVariable UUID documentId,
@@ -67,6 +69,8 @@ public class DocumentVersionController {
 	// =========================
 	// DELETE VERSION
 	// =========================
+	@PreAuthorize("hasAnyRole('ADMIN')")
+	@DeleteMapping("/{version}")
 	@Operation(
 			summary = "Excluir versão",
 			description = "Remove uma versão específica do documento. Não permite excluir a versão mais recente.")
@@ -76,7 +80,6 @@ public class DocumentVersionController {
 					@ApiResponse(responseCode = "400", description = "Regra de negócio violada"),
 					@ApiResponse(responseCode = "404", description = "Documento ou versão não encontrada")
 			})
-	@DeleteMapping("/{version}")
 	public ResponseEntity<Void> deleteVersion(
 			@Parameter(description = "ID do documento", required = true)
 			@PathVariable UUID documentId,
@@ -90,6 +93,8 @@ public class DocumentVersionController {
 	// =========================
 	// GET VERSION METADATA
 	// =========================
+	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+	@GetMapping("/{version}/metadata")
 	@Operation(
 			summary = "Consultar metadados da versão",
 			description = "Retorna os metadados de uma versão específica do documento.")
@@ -98,7 +103,6 @@ public class DocumentVersionController {
 					@ApiResponse(responseCode = "200", description = "Consulta realizada com sucesso"),
 					@ApiResponse(responseCode = "404", description = "Versão não encontrada")
 			})
-	@GetMapping("/{version}/metadata")
 	public ResponseEntity<DocumentVersionResponseDTO> getVersion(
 			@Parameter(description = "ID do documento", required = true)
 			@PathVariable UUID documentId,
@@ -110,6 +114,8 @@ public class DocumentVersionController {
 	// =========================
 	// DOWNLOAD
 	// =========================
+	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+	@GetMapping("/{version}")
 	@Operation(
 			summary = "Download da versão",
 			description = "Realiza o download do arquivo de uma versão específica do documento.")
@@ -118,7 +124,6 @@ public class DocumentVersionController {
 					@ApiResponse(responseCode = "200", description = "Download realizado com sucesso"),
 					@ApiResponse(responseCode = "404", description = "Arquivo não encontrado")
 			})
-	@GetMapping("/{version}")
 	public ResponseEntity<byte[]> download(
 			@Parameter(description = "ID do documento", required = true)
 			@PathVariable UUID documentId,
@@ -152,6 +157,8 @@ public class DocumentVersionController {
 	// =========================
 	// LIST VERSIONS
 	// =========================
+	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+	@GetMapping
 	@Operation(
 			summary = "Listar versões",
 			description = "Lista todas as versões de um documento.")
@@ -160,7 +167,6 @@ public class DocumentVersionController {
 					@ApiResponse(responseCode = "200", description = "Listagem realizada com sucesso"),
 					@ApiResponse(responseCode = "404", description = "Documento não encontrado")
 			})
-	@GetMapping
 	public ResponseEntity<List<DocumentVersionResponseDTO>> listVersions(
 			@Parameter(description = "ID do documento", required = true)
 			@PathVariable UUID documentId) {

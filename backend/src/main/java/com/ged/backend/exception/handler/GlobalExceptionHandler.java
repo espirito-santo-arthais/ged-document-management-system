@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -78,6 +80,25 @@ public class GlobalExceptionHandler {
 				.build();
 
 		return ResponseEntity.badRequest().body(response);
+	}
+
+	// TRATA ERRO DE SEGURANÇA
+	@ExceptionHandler({ AccessDeniedException.class, AuthorizationDeniedException.class })
+	public ResponseEntity<ErrorResponse> handleAccessDenied(
+			Exception ex,
+			HttpServletRequest request) {
+
+		log.warn("Access denied: {}", ex.getMessage());
+
+		ErrorResponse response = ErrorResponse.builder()
+				.timestamp(LocalDateTime.now())
+				.status(403)
+				.error("Forbidden")
+				.message("Acesso negado")
+				.path(request.getRequestURI())
+				.build();
+
+		return ResponseEntity.status(403).body(response);
 	}
 
 	// QUALQUER ERRO NÃO TRATADO
