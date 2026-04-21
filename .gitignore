@@ -4,6 +4,7 @@
 .env
 .env.local
 .env.*.local
+!.env.example
 
 # ========================
 # OS / SYSTEM FILES
@@ -37,11 +38,32 @@ temp/
 .cache/
 
 # ========================
-# NODE (safety - fallback)
+# NODE / FRONTEND (Angular)
 # ========================
 node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.cache/
+
+# Angular logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
 
 # ========================
-# JAVA (fallback)
+# JAVA / BACKEND (Spring)
 # ========================
 target/
+backend/target/
+
+# Eclipse / STS
+backend/.classpath
+backend/.project
+backend/.settings/
+
+# ========================
+# BUILD / GENERATED
+# ========================
+dist/
+build/
