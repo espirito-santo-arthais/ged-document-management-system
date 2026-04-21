@@ -1,0 +1,9 @@
+services:
+  frontend:
+    build:
+      context: ../frontend
+    container_name: ged-frontend
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT}:80"

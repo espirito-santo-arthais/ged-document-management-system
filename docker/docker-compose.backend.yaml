@@ -1,0 +1,16 @@
+services:
+  backend:
+    build:
+      context: ../backend
+    container_name: ged-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    env_file:
+      - ../.env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "${SERVER_PORT}:8080"
