@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ged_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+  flyway:
+    enabled: true
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+    
+# ========================
+# JWT
+# ========================
+jwt:
+  secret: super-secret-key-super-secret-key-123456
+  expiration: 3600000
+
+# ========================
+# MINIO
+# ========================
+minio:
+  enabled: false

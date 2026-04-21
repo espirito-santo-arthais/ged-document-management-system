@@ -22,7 +22,7 @@ import com.jayway.jsonpath.JsonPath;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 @DisplayName("DocumentController - Testes de Integração")
 class DocumentControllerIT {
 
