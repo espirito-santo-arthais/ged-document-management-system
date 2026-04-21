@@ -454,7 +454,7 @@
                   "key": "file",
                   "type": "file",
                   "uuid": "ea8b0870-c734-46ee-bc19-42e79b930ae4",
-                  "src": "/C:/Users/espir/Downloads/12 - Extrato - Santander - PF.pdf"
+                  "src": "/C:/Users/espir/OneDrive/Documentos/Apresentação_Fit_Bank - Produtos.pdf"
                 }
               ]
             },
@@ -475,7 +475,73 @@
           "response": []
         },
         {
-          "name": "delete",
+          "name": "listagem de versões",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/documents/d23b0f3a-8fee-4d26-92be-072e2a5f36f0/versions",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "documents",
+                "d23b0f3a-8fee-4d26-92be-072e2a5f36f0",
+                "versions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "consultar versão",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/documents/d23b0f3a-8fee-4d26-92be-072e2a5f36f0/versions/4/metadata",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "documents",
+                "d23b0f3a-8fee-4d26-92be-072e2a5f36f0",
+                "versions",
+                "4",
+                "metadata"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "download de versão",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/documents/d23b0f3a-8fee-4d26-92be-072e2a5f36f0/versions/5",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "documents",
+                "d23b0f3a-8fee-4d26-92be-072e2a5f36f0",
+                "versions",
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "exclusão de versão",
           "request": {
             "method": "DELETE",
             "header": [],
@@ -495,74 +561,103 @@
             }
           },
           "response": []
-        },
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
         {
-          "name": "get metadata",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8080/documents/d23b0f3a-8fee-4d26-92be-072e2a5f36f0/versions/5/metadata",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "documents",
-                "d23b0f3a-8fee-4d26-92be-072e2a5f36f0",
-                "versions",
-                "5",
-                "metadata"
-              ]
+          "name": "login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "\r",
+                  "pm.collectionVariables.set(\"ged_token\", response.token);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
             }
-          },
-          "response": []
-        },
-        {
-          "name": "download",
+          ],
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"admin123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "http://localhost:8080/documents/d23b0f3a-8fee-4d26-92be-072e2a5f36f0/versions/5",
+              "raw": "http://localhost:8080/auth/login",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
               "port": "8080",
               "path": [
-                "documents",
-                "d23b0f3a-8fee-4d26-92be-072e2a5f36f0",
-                "versions",
-                "5"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "get versions",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8080/documents/d23b0f3a-8fee-4d26-92be-072e2a5f36f0/versions",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "documents",
-                "d23b0f3a-8fee-4d26-92be-072e2a5f36f0",
-                "versions"
+                "auth",
+                "login"
               ]
             }
           },
           "response": []
         }
       ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{ged_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "ged_token",
+      "value": ""
     }
   ]
 }

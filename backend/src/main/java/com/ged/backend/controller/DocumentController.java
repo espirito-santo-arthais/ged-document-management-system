@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -38,6 +39,7 @@ public class DocumentController {
 
 	private final DocumentService service;
 
+	@PreAuthorize("hasAnyRole('ADMIN')")
 	@PostMapping
 	@Operation(summary = "Criar novo documento", description = "Cria um novo documento com metadados.")
 	@ApiResponse(responseCode = "201", description = "Documento criado com sucesso")
@@ -48,6 +50,7 @@ public class DocumentController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
 	}
 
+	@PreAuthorize("hasAnyRole('ADMIN')")
 	@PatchMapping("/{id}")
 	@Operation(summary = "Atualizar documento", description = "Atualiza os metadados de um documento existente.")
 	@ApiResponse(responseCode = "200", description = "Documento atualizado com sucesso")
@@ -60,6 +63,7 @@ public class DocumentController {
 		return ResponseEntity.ok(service.update(id, dto));
 	}
 
+	@PreAuthorize("hasAnyRole('ADMIN')")
 	@DeleteMapping("/{id}")
 	@Operation(summary = "Excluir documento", description = "Remove um documento pelo ID. Esta operação é irreversível.")
 	@ApiResponse(responseCode = "204", description = "Documento excluído com sucesso")
@@ -71,6 +75,7 @@ public class DocumentController {
 		return ResponseEntity.noContent().build();
 	}
 
+	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 	@GetMapping("/{id}")
 	@Operation(summary = "Buscar documento por ID", description = "Retorna os dados de um documento específico pelo seu ID.")
 	@ApiResponse(responseCode = "200", description = "Documento encontrado")
@@ -81,6 +86,7 @@ public class DocumentController {
 		return ResponseEntity.ok(service.findById(id));
 	}
 
+	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 	@PostMapping("/search")
 	@Operation(summary = "Buscar documentos", description = """
 			Realiza busca de documentos com filtros opcionais.
