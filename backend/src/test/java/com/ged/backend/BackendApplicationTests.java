@@ -1,5 +1,8 @@
 package com.ged.backend;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,10 +18,14 @@ class BackendApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// se subir sem erro, já é sucesso
 	}
 
 	@Test
-	void test() {
-	    System.out.println(env.getProperty("spring.datasource.url"));
+	void shouldLoadDatasourceConfig() {
+		String url = env.getProperty("spring.datasource.url");
+
+		assertNotNull(url);
+		assertTrue(url.contains("jdbc:postgresql"));
 	}
 }
