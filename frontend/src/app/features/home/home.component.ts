@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
@@ -11,6 +11,12 @@ import {
   Document,
   Page
 } from '../../core/services/document/document.service';
+
+import {
+  DocumentVersionService,
+  DocumentVersion,
+  DocumentVersionMetadata
+} from '../../core/services/document-version/document-version.service';
 
 @Component({
   selector: 'app-home',
@@ -28,6 +34,13 @@ export class HomeComponent {
 
   tagInput = '';
 
+  versions: (DocumentVersion & { documentId: string })[] = [];
+  selectedDocumentForVersions: string | null = null;
+  selectedVersionMetadata: DocumentVersionMetadata | null = null;
+
+  loadingVersions = false;
+  showVersions = false;
+
   filters: DocumentSearchRequest = {
     title: '',
     searchType: 'CONTAINS',
@@ -43,11 +56,16 @@ export class HomeComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private documentVersionService: DocumentVersionService,
+    private cdr: ChangeDetectorRef
   ) {
     this.loadPage();
   }
 
+  // =========================================
+  // TAGS
+  // =========================================
   addTag(): void {
     const value = this.tagInput.trim();
 
@@ -62,6 +80,9 @@ export class HomeComponent {
     this.filters.tags = this.filters.tags?.filter(t => t !== tag);
   }
 
+  // =========================================
+  // FILTERS
+  // =========================================
   private buildFilters(): DocumentSearchRequest {
     const f: DocumentSearchRequest = {};
 
@@ -101,6 +122,9 @@ export class HomeComponent {
     return f;
   }
 
+  // =========================================
+  // PAGINAÇÃO
+  // =========================================
   loadPage(): void {
     this.documentsPage$ = this.documentService.search(
       this.buildFilters(),
@@ -111,13 +135,24 @@ export class HomeComponent {
 
   applyFilters(): void {
     this.currentPage = 0;
+
+    this.resetVersions();
     this.loadPage();
+  }
+
+  private resetVersions(): void {
+    this.versions = [];
+    this.selectedVersionMetadata = null;
+    this.showVersions = false;
+    this.loadingVersions = false;
   }
 
   nextPage(page: Page<Document>): void {
     if (page.number + 1 >= page.totalPages) return;
 
     this.currentPage++;
+
+    this.resetVersions();
     this.loadPage();
   }
 
@@ -125,6 +160,8 @@ export class HomeComponent {
     if (page.number === 0) return;
 
     this.currentPage--;
+
+    this.resetVersions();
     this.loadPage();
   }
 
@@ -138,6 +175,64 @@ export class HomeComponent {
     this.loadPage();
   }
 
+  // =========================================
+  // VERSÕES
+  // =========================================
+  loadVersions(documentId: string): void {
+
+    this.selectedVersionMetadata = null;
+    this.loadingVersions = true;
+    this.showVersions = true;
+    this.versions = [];
+
+    this.documentVersionService.getVersions(documentId)
+      .subscribe({
+        next: (data) => {
+          try {
+            this.versions = (data ?? []).map(v => ({
+              ...v,
+              documentId
+            }));
+          } catch (e) {
+            console.error('ERRO NO MAP DAS VERSIONS', e);
+            this.versions = [];
+          } finally {
+            this.loadingVersions = false;
+            this.cdr.detectChanges();
+          }
+        },
+        error: (err) => {
+          console.error('VERSIONS ERROR', err);
+          this.loadingVersions = false;
+          this.versions = [];
+          this.cdr.detectChanges();
+          alert('Erro ao carregar versões');
+        }
+      });
+  }
+
+  // =========================================
+  // DETALHE DA VERSÃO
+  // =========================================
+  loadVersionMetadata(documentId: string, version: number): void {
+    this.documentVersionService
+      .getVersionMetadata(documentId, version)
+      .subscribe({
+        next: (data) => {
+          this.selectedVersionMetadata = data;
+
+          // FORÇA ATUALIZAÇÃO DO HTML
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          alert('Erro ao carregar metadata da versão');
+        }
+      });
+  }
+
+  // =========================================
+  // LOGOUT
+  // =========================================
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
