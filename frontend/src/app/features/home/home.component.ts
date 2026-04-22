@@ -14,14 +14,34 @@ import { DocumentService, Document, Page } from '../../core/services/document/do
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent {
-  documentsPage$: Observable<Page<Document>>;
+
+  documentsPage$!: Observable<Page<Document>>;
+
+  currentPage = 0;
+  pageSize = 20;
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private documentService: DocumentService
   ) {
-    this.documentsPage$ = this.documentService.search();
+    this.loadPage();
+  }
+
+  loadPage(): void {
+    this.documentsPage$ = this.documentService.search(this.currentPage, this.pageSize);
+  }
+
+  nextPage(): void {
+    this.currentPage++;
+    this.loadPage();
+  }
+
+  prevPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.loadPage();
+    }
   }
 
   logout(): void {

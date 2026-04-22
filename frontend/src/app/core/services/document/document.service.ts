@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
 export interface Document {
   id: string;
   title: string;
@@ -26,10 +25,17 @@ export class DocumentService {
 
   constructor(private http: HttpClient) { }
 
-  search(): Observable<Page<Document>> {
+  search(page: number = 0, size: number = 10): Observable<Page<Document>> {
+
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sort', 'title,asc');
+
     return this.http.post<Page<Document>>(
       `${this.apiUrl}/documents/search`,
-      {}
+      {},
+      { params }
     );
   }
 }
