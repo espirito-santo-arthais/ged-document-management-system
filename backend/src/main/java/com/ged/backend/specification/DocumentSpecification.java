@@ -108,21 +108,22 @@ public class DocumentSpecification {
     }
 
     public static Specification<Document> hasTags(List<String> tags) {
-        return (root, query, cb) -> {
-            if (tags == null || tags.isEmpty()) {
-                return null;
-            }
+    return (root, query, cb) -> {
+        if (tags == null || tags.isEmpty()) {
+            return null;
+        }
 
-            query.distinct(true);
+        query.distinct(true);
 
-            Join<Object, Object> tagJoin = root.join("tags", JoinType.LEFT);
+        // importante: tipar corretamente
+        Join<Document, String> tagJoin = root.join("tags", JoinType.LEFT);
 
-            List<String> lowerTags = tags.stream()
-                    .filter(tag -> tag != null && !tag.isBlank())
-                    .map(tag -> tag.trim().toLowerCase())
-                    .toList();
+        List<String> lowerTags = tags.stream()
+                .filter(tag -> tag != null && !tag.isBlank())
+                .map(tag -> tag.trim().toLowerCase())
+                .toList();
 
-            return cb.lower(tagJoin).in(lowerTags);
-        };
-    }
+        return cb.lower(tagJoin).in(lowerTags);
+    };
+}
 }
