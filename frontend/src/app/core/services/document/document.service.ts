@@ -7,6 +7,7 @@ export interface Document {
   title: string;
   description: string;
   status: string;
+  tags: string[];
 }
 
 export interface Page<T> {
@@ -23,7 +24,7 @@ export interface Page<T> {
 export class DocumentService {
   private apiUrl = 'http://localhost:8080';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   search(): Observable<Page<Document>> {
     return this.http.post<Page<Document>>(
