@@ -1,0 +1,15 @@
+.table-container {
+    border-radius: 12px; /* Ajuste o tamanho do arredondamento aqui */
+    border: 1px solid #dee2e6; /* Cor da borda padrão do Bootstrap */
+    overflow: hidden; /* Isso é o que impede o cabeçalho de "comer" o arredondamento */
+}
+
+/* Remove a borda inferior da última linha para não ficar com borda dupla no fundo */
+.table-container table {
+    border: none;
+}
+
+/* Garante que o cabeçalho escuro também respeite o arredondamento superior */
+.table-primary {
+    border-top: none;
+}

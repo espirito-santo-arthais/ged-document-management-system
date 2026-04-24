@@ -1,2 +1,19 @@
-<h1>Frontend funcionando 🚀</h1>
-<router-outlet></router-outlet>
+<div>
+
+  <!-- HEADER GLOBAL -->
+  <nav class="navbar navbar-dark bg-dark px-3">
+
+    <span class="navbar-brand">GED - Document Management System V1.0.0</span>
+
+    <button *ngIf="isLoggedIn()"
+            class="btn btn-outline-light btn-sm"
+            (click)="logout()">
+      Sair
+    </button>
+
+  </nav>
+
+  <!-- CONTEÚDO DAS TELAS -->
+  <router-outlet></router-outlet>
+
+</div>
