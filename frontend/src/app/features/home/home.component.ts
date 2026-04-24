@@ -230,11 +230,5 @@ export class HomeComponent {
       });
   }
 
-  // =========================================
-  // LOGOUT
-  // =========================================
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
-  }
+
 }
