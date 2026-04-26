@@ -1,4 +1,27 @@
-table {
-    border-radius: 8px;
-    overflow: hidden;
+.landing-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid #dee2e6;
+}
+
+.navbar-brand {
+    letter-spacing: 1px;
+}
+
+.hero-section h1 {
+    color: #212529;
+}
+
+i.bi {
+    display: block;
+    margin-bottom: 1rem;
+}
+
+footer {
+    margin-top: auto;
 }
