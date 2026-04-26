@@ -1,19 +1,23 @@
-import { Component } from "@angular/core";
+import { Component, ChangeDetectorRef, OnInit, inject } from "@angular/core";
 import { Router } from '@angular/router';
 import { CommonModule } from "@angular/common";
-import { Observable } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 
+// SHARED & CORE
 import { ShortIdPipe } from '../../shared/pipes/short-id-pipe';
 import { AuthService } from '../../core/services/auth/auth.service';
+import { LoadingService } from '../../core/services/loading/loading.service';
+import { DocumentService } from '../../core/services/document/document.service';
+
+// MODELS - IMPORTAÇÃO CORRETA DOS MODELOS
 import {
-  DocumentSearchRequest,
   Document,
+  DocumentSearchRequest
+} from '../../core/models/document.model';
+import {
   Page,
-  SortOption,
-  DocumentService,
-} from '../../core/services/document/document.service';
-import { Title } from "@angular/platform-browser";
+  SortOption
+} from '../../core/models/pagination.model';
 
 @Component({
   selector: "app-document-list",
@@ -22,11 +26,19 @@ import { Title } from "@angular/platform-browser";
   templateUrl: "./document-list.component.html",
   styleUrls: ["./document-list.component.css"],
 })
-export class DocumentListComponent {
+export class DocumentListComponent implements OnInit {
+  // Injeções Modernas
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private documentService = inject(DocumentService);
+  private cdr = inject(ChangeDetectorRef);
+  protected loadingService = inject(LoadingService);
 
-  documentsPage$!: Observable<Page<Document>>;
+  // Estado da Lista
+  page: Page<Document> | null = null;
+  documents: Document[] = [];
 
-  // Objeto para controlar a exibição das colunas
+  // Configurações de Exibição
   showFields = {
     Title: true,
     description: true,
@@ -37,7 +49,6 @@ export class DocumentListComponent {
     tags: true
   };
 
-  // Mapeamento de campos técnicos para nomes amigáveis
   columnMap: { [key: string]: string } = {
     'title': 'Título',
     'description': 'Descrição',
@@ -47,12 +58,10 @@ export class DocumentListComponent {
     'updatedAt': 'Atualizado em'
   };
 
-  // Array de chaves técnicas para iterar no HTML
   sortableFields = Object.keys(this.columnMap);
-
-  // Array para controlar a ordenação múltipla
   activeSorts: SortOption[] = [];
 
+  // Filtros
   filters: DocumentSearchRequest = {
     title: '',
     searchType: 'CONTAINS',
@@ -66,15 +75,10 @@ export class DocumentListComponent {
   };
 
   tagInput = '';
-
   currentPage = 0;
   pageSize = 20;
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private documentService: DocumentService
-  ) {
+  ngOnInit(): void {
     this.loadPage();
   }
 
@@ -83,9 +87,7 @@ export class DocumentListComponent {
   // =========================================
 
   addSort(field: string, direction: 'asc' | 'desc'): void {
-    // Remove o campo se já existir para garantir a nova posição/sentido na fila
     this.activeSorts = this.activeSorts.filter(s => s.field !== field);
-
     this.activeSorts.push({ field, direction });
     this.loadPage();
   }
@@ -100,37 +102,30 @@ export class DocumentListComponent {
     this.loadPage();
   }
 
-  // =========================================
-  // ORDENAÇÃO (ADICIONAR/REMOVER)
-  // =========================================
-
-  toggleSort(field: string) {
+  toggleSort(field: string): void {
     const index = this.activeSorts.findIndex(s => s.field === field);
 
     if (index > -1) {
-      // Se já existe, inverte a ordem ou remove
       if (this.activeSorts[index].direction === 'asc') {
         this.activeSorts[index].direction = 'desc';
       } else {
-        this.activeSorts.splice(index, 1); // Remove se clicar de novo após desc
+        this.activeSorts.splice(index, 1);
       }
     } else {
-      // Adiciona nova ordenação no final da fila
       this.activeSorts.push({ field, direction: 'asc' });
     }
     this.applyFilters();
   }
 
   // =========================================
-  // TAGS (ADICIONAR/REMOVER)
+  // TAGS
   // =========================================
   addTag(): void {
     const value = this.tagInput.trim();
-
     if (value && !this.filters.tags?.includes(value)) {
-      this.filters.tags?.push(value);
+      if (!this.filters.tags) this.filters.tags = [];
+      this.filters.tags.push(value);
     }
-
     this.tagInput = '';
   }
 
@@ -139,12 +134,11 @@ export class DocumentListComponent {
   }
 
   // =========================================
-  // FILTERS
+  // FILTERS & PAGINAÇÃO
   // =========================================
   private buildFilters(): DocumentSearchRequest {
     const f: DocumentSearchRequest = { ...this.filters };
 
-    // Limpeza de campos vazios para não enviar sujeira na request
     if (!f.title?.trim()) delete f.title;
     if (!f.status) delete f.status;
     if (!f.owner?.trim()) delete f.owner;
@@ -157,16 +151,23 @@ export class DocumentListComponent {
     return f;
   }
 
-  // =========================================
-  // PAGINAÇÃO E CARREGAMENTO
-  // =========================================
   loadPage(): void {
-    this.documentsPage$ = this.documentService.search(
+    this.documentService.search(
       this.buildFilters(),
       this.currentPage,
       this.pageSize,
       this.activeSorts
-    );
+    ).subscribe({
+      next: (page) => {
+        this.page = page;
+        this.documents = page.content;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        // Erro já vem formatado pelo interceptor
+        console.error('Erro na busca:', err.message);
+      }
+    });
   }
 
   applyFilters(): void {
@@ -189,28 +190,45 @@ export class DocumentListComponent {
   goToPage(event: Event): void {
     const input = event.target as HTMLInputElement;
     const value = Number(input.value);
-
     if (isNaN(value) || value < 1) return;
-
     this.currentPage = value - 1;
     this.loadPage();
   }
 
-
+  // =========================================
+  // AÇÕES
+  // =========================================
   createDocument(event: Event): void {
-    console.log('createDocument foi acionado');
+    this.router.navigate(['/documents/new']);
   }
 
   viewDocument(event: Event, documentId: string): void {
-    console.log('viewDocument foi acionado');
+    this.router.navigate(['/documents', documentId]);
   }
 
   updateDocument(event: Event, documentId: string): void {
-    console.log('updateDocument foi acionado');
+    this.router.navigate(['/documents', documentId, 'edit']);
   }
 
   deleteDocument(event: Event, documentId: string): void {
-    console.log('deleteDocument foi acionado');
-  }
+    if (!confirm('Confirma exclusão do documento?')) return;
 
+    this.documentService.delete(documentId).subscribe({
+      next: () => {
+        this.documents = this.documents.filter(doc => doc.id !== documentId);
+        if (this.page) {
+          this.page.totalElements--;
+        }
+        if (this.documents.length === 0 && this.currentPage > 0) {
+          this.currentPage--;
+          this.loadPage();
+        }
+      },
+      error: (err) => {
+        // O interceptor já formatou a mensagem em um objeto Error
+        alert(err.message);
+        console.error('Erro ao deletar:', err.message);
+      }
+    });
+  }
 }

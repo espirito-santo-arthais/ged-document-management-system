@@ -23,6 +23,7 @@ import com.ged.backend.mapper.DocumentMapper;
 import com.ged.backend.repository.DocumentRepository;
 import com.ged.backend.specification.DocumentSpecification;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +34,7 @@ public class DocumentService {
 
 	private final DocumentRepository repository;
 
+	@Transactional
 	public DocumentResponseDTO create(DocumentCreateRequestDTO dto) {
 		log.info("Iniciando criação de documento. Título: {}", dto.getTitle());
 
@@ -60,6 +62,7 @@ public class DocumentService {
 		}
 	}
 
+	@Transactional
 	public DocumentResponseDTO update(UUID id, DocumentUpdateRequestDTO dto) {
 		log.info("Iniciando atualização de documento. ID (path): {}, ID (body): {}", id, dto.getId());
 
@@ -112,6 +115,7 @@ public class DocumentService {
 		}
 	}
 
+	@Transactional
 	public void delete(UUID id) {
 		log.info("Iniciando exclusão de documento. ID: {}", id);
 

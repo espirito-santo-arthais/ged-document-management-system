@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { LoadingService } from '../../../core/services/loading/loading.service'; 
 
 @Component({
   selector: 'app-login',
@@ -12,32 +13,24 @@ import { AuthService } from '../../../core/services/auth/auth.service';
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  // Expondo o loadingService para o template
+  protected loadingService = inject(LoadingService);
+
   username = '';
   password = '';
-  error = '';
-  loading = false;
-
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) { }
+  errorMessage = '';
 
   onSubmit() {
-    this.error = '';
-    this.loading = true;
+    this.errorMessage = '';
 
-    this.authService.login({
-      username: this.username,
-      password: this.password
-    }).subscribe({
-      next: (response) => {
-        this.authService.saveToken(response.token);
-        this.loading = false;
+    this.authService.login({ username: this.username, password: this.password }).subscribe({
+      next: () => {
         this.router.navigate(['/home']);
       },
-      error: () => {
-        this.error = 'Usuário ou senha inválidos';
-        this.loading = false;
+      error: (err: Error) => {
+        this.errorMessage = err.message;
       }
     });
   }

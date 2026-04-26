@@ -4,15 +4,14 @@
         <div class="card-body">
             <div
                 class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
-                
+
                 <h4 class="mb-0">Documentos</h4>
 
                 <div class="d-flex flex-wrap align-items-center gap-3">
 
-                    <!-- COLUNAS -->
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button"
-                            data-bs-toggle="dropdown">
+                            data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-layout-three-columns"></i> Colunas
                         </button>
                         <ul class="dropdown-menu p-3" style="min-width: 200px;">
@@ -21,26 +20,48 @@
                                 <input class="form-check-input" type="checkbox" checked disabled>
                                 <label class="form-check-label small text-muted">Título</label>
                             </li>
-                            <li class="form-check" *ngFor="let item of columnMap | keyvalue">
-                                <input class="form-check-input" type="checkbox"
-                                    [(ngModel)]="$any(showFields)[item.key]">
-                                <label class="form-check-label small">{{ item.value }}</label>
+                            <li class="form-check">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="showFields.description">
+                                <label class="form-check-label small">Descrição</label>
+                            </li>
+                            <li class="form-check">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="showFields.status">
+                                <label class="form-check-label small">Status</label>
+                            </li>
+                            <li class="form-check">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="showFields.owner">
+                                <label class="form-check-label small">Proprietário</label>
+                            </li>
+                            <li class="form-check">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="showFields.createdAt">
+                                <label class="form-check-label small">Criado em</label>
+                            </li>
+                            <li class="form-check">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="showFields.updatedAt">
+                                <label class="form-check-label small">Atualizado em</label>
+                            </li>
+                            <li class="form-check">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="showFields.tags">
+                                <label class="form-check-label small">Tags</label>
                             </li>
                         </ul>
                     </div>
 
-                    <!-- ORDENAÇÂO -->
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button"
-                            data-bs-toggle="dropdown">
+                            data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-sort-alpha-down"></i> Ordenar
                         </button>
                         <div class="dropdown-menu p-3" style="min-width: 250px;">
-                            <div class="mb-2"><label class="small fw-bold text-primary">Clique para adicionar à
-                                    fila:</label></div>
+                            <div class="mb-2">
+                                <label class="small fw-bold text-primary">Clique para adicionar à fila:</label>
+                            </div>
+
                             <div *ngFor="let field of sortableFields"
                                 class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="small">{{ columnMap[field] || field }}</span>
+
+                                <span class="small">{{ columnMap[field] }}</span>
+
                                 <div class="btn-group btn-group-sm">
                                     <button class="btn btn-outline-primary py-0"
                                         (click)="addSort(field, 'asc')">ASC</button>
@@ -48,25 +69,30 @@
                                         (click)="addSort(field, 'desc')">DESC</button>
                                 </div>
                             </div>
+
                             <hr class="dropdown-divider">
+
                             <div class="small mb-2 fw-bold" *ngIf="activeSorts.length > 0">Fila atual:</div>
                             <div *ngFor="let s of activeSorts; let i = index"
                                 class="badge bg-light text-dark d-flex justify-content-between align-items-center mb-1 border">
-                                <span>{{i+1}}º: {{ columnMap[s.field] || s.field }} ({{s.direction}})</span>
+
+                                <span>{{i+1}}º: {{ columnMap[s.field] }} ({{s.direction}})</span>
+
                                 <i class="bi bi-x-circle text-danger ms-2" style="cursor: pointer;"
                                     (click)="removeSort(i)"></i>
                             </div>
+
                             <button *ngIf="activeSorts.length > 0" class="btn btn-link btn-sm text-danger p-0 mt-2"
                                 (click)="clearSorts()">Limpar Tudo</button>
                         </div>
                     </div>
 
-                    <!-- NOVO-->
                     <button class="btn btn-success btn-sm d-flex align-items-center gap-1"
-                        (click)="createDocument($event)">
-                        <i class="bi bi-plus-lg"></i><span>Novo</span>
+                        (click)="createDocument($event)" title="Novo">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>Novo</span>
                     </button>
-                    
+
                 </div>
             </div>
         </div>
@@ -75,178 +101,249 @@
     <ng-container *ngIf="page">
 
         <!-- FILTROS -->
-        <div class="card p-3 mb-3 shadow-sm border-start border-primary border-4">
+        <div class="card p-3 mb-3">
 
-              <!-- FILTROS TEXTUAIS -->
+            <!-- FILTROS TEXTUAIS -->
             <div class="row g-2">
 
                 <!-- TÍTULO + TIPO -->
                 <div class="col-md-6">
                     <div class="input-group">
+
                         <select class="form-select" style="max-width: 150px;" [(ngModel)]="filters.searchType">
                             <option value="CONTAINS">Contendo</option>
                             <option value="STARTS_WITH">Iniciando com</option>
                         </select>
+
                         <input type="text" class="form-control" placeholder="Buscar no título e/ou descrição..."
                             [(ngModel)]="filters.title" (keyup.enter)="applyFilters()" />
+
                     </div>
                 </div>
 
-                 <!-- STATUS e OWNER -->
+                <!-- STATUS e OWNER -->
                 <div class="col-md-6">
+
                     <div class="row g-2">
+
                         <div class="col-md-6">
                             <select class="form-select" [(ngModel)]="filters.status">
                                 <option value="">Status</option>
-                                <option value="DRAFT">Rascunho</option>
+                                <option value="DRAFT">Racunho</option>
                                 <option value="PUBLISHED">Publicado</option>
                                 <option value="ARCHIVED">Arquivado</option>
                             </select>
                         </div>
+
                         <div class="col-md-6">
                             <input class="form-control" placeholder="Proprietário" [(ngModel)]="filters.owner" />
                         </div>
+
                     </div>
+
                 </div>
 
             </div>
 
-             <!-- DATAS -->
+            <!-- DATAS -->
             <div class="row g-2 mt-2">
 
-                 <!-- createdAt -->
+                <!-- createdAt -->
                 <div class="col-md-6">
+
                     <div class="row g-2">
+
                         <div class="col-md-6">
-                            <label class="small text-muted">Criação de</label>
-                            <input type="datetime-local" class="form-control form-control-sm"
-                                [(ngModel)]="filters.createdAfter" />
+                            <label>Criação de</label>
+                            <input type="datetime-local" class="form-control" [(ngModel)]="filters.createdAfter" />
                         </div>
+
                         <div class="col-md-6">
-                            <label class="small text-muted">Criação até</label>
-                            <input type="datetime-local" class="form-control form-control-sm"
-                                [(ngModel)]="filters.createdBefore" />
+                            <label>Criação até</label>
+                            <input type="datetime-local" class="form-control" [(ngModel)]="filters.createdBefore" />
                         </div>
+
                     </div>
+
                 </div>
 
                 <!-- updatedAt -->
                 <div class="col-md-6">
+
                     <div class="row g-2">
+
                         <div class="col-md-6">
-                            <label class="small text-muted">Atualização de</label>
-                            <input type="datetime-local" class="form-control form-control-sm"
-                                [(ngModel)]="filters.updatedAfter" />
+                            <label>Atualização de</label>
+                            <input type="datetime-local" class="form-control" [(ngModel)]="filters.updatedAfter" />
                         </div>
+
                         <div class="col-md-6">
-                            <label class="small text-muted">Atualização até</label>
-                            <input type="datetime-local" class="form-control form-control-sm"
-                                [(ngModel)]="filters.updatedBefore" />
+                            <label>Atualização até</label>
+                            <input type="datetime-local" class="form-control" [(ngModel)]="filters.updatedBefore" />
                         </div>
+
                     </div>
+
                 </div>
 
             </div>
 
-              <!-- TAGS e BOTÃO -->
+            <!-- TAGS e BOTÃO -->
             <div class="row g-2 mt-2">
 
-                 <!-- TAGS -->
+                <!-- TAGS -->
                 <div class="col-md-9 pt-2">
-                    <div class="input-group input-group-sm">
+
+                    <div class="input-group">
                         <input class="form-control" placeholder="Adicionar tag" [(ngModel)]="tagInput"
                             (keyup.enter)="addTag()" />
+
                         <button class="btn btn-outline-primary" (click)="addTag()">+</button>
                     </div>
+
                     <div class="mt-2">
-                        <span *ngFor="let tag of filters.tags" class="badge bg-info text-dark me-2">
-                            {{ tag }} <span style="cursor:pointer;" (click)="removeTag(tag)">✖</span>
+                        <span *ngFor="let tag of filters.tags" class="badge bg-info me-2">
+                            {{ tag }}
+                            <span style="cursor:pointer;" (click)="removeTag(tag)">✖</span>
                         </span>
                     </div>
+
                 </div>
 
-                 <!-- BOTÃO -->
+                <!-- BOTÃO -->
                 <div class="col-md-3 d-grid">
-                    <button class="btn btn-primary" (click)="applyFilters()" [disabled]="loadingService.isLoading()">
-                        {{ loadingService.isLoading() ? 'Processando...' : 'Filtrar' }}
+                    <button class="btn btn-primary" (click)="applyFilters()">
+                        Filtrar
                     </button>
                 </div>
 
             </div>
+
         </div>
 
         <!-- PAGINAÇÃO SUPERIOR -->
-        <div *ngIf="page.totalElements > 0" class="d-flex justify-content-between align-items-center mb-3">
+        <div *ngIf="page.totalElements > 0" class="d-flex justify-content-between align-items-center mt-3 mb-3">
+
             <div class="d-flex align-items-center gap-3">
-                <span class="small">Mostrando <strong>{{ page.content.length }}</strong> de <strong>{{
-                        page.totalElements }}</strong></span>
-                <select class="form-select form-select-sm" style="width: auto;" [(ngModel)]="pageSize"
-                    (change)="applyFilters()">
-                    <option [value]="10">10</option>
-                    <option [value]="50">50</option>
-                    <option [value]="100">100</option>
-                </select>
+                <div>
+                    Mostrando <strong>{{ page.content.length }}</strong> de <strong>{{ page.totalElements }}</strong>
+                    registros
+                </div>
+
+                <div class="input-group input-group-sm" style="width: auto;">
+                    <label class="input-group-text" for="pageSizeSelect">Exibir</label>
+                    <select class="form-select" id="pageSizeSelect" [(ngModel)]="pageSize" (change)="applyFilters()">
+                        <option [value]="10">10</option>
+                        <option [value]="20">20</option>
+                        <option [value]="50">50</option>
+                        <option [value]="100">100</option>
+                    </select>
+                </div>
             </div>
+
             <div class="d-flex align-items-center gap-2">
-                <button class="btn btn-sm btn-outline-primary" (click)="prevPage(page)"
-                    [disabled]="page.number === 0 || loadingService.isLoading()">
+
+                <button class="btn btn-sm btn-outline-primary" (click)="prevPage(page)" [disabled]="page.number === 0">
                     <i class="bi bi-chevron-left"></i>
                 </button>
-                <span class="small">Página {{ page.number + 1 }} de {{ page.totalPages }}</span>
+
+                <span class="text-muted small">
+                    Página {{ page.number + 1 }} de {{ page.totalPages }}
+                </span>
+
                 <button class="btn btn-sm btn-outline-primary" (click)="nextPage(page)"
-                    [disabled]="page.number + 1 >= page.totalPages || loadingService.isLoading()">
+                    [disabled]="page.number + 1 >= page.totalPages">
                     <i class="bi bi-chevron-right"></i>
                 </button>
+
+                <div class="input-group input-group-sm ms-2" style="width: 120px;">
+                    <span class="input-group-text">Ir:</span>
+                    <input type="number" min="1" [max]="page.totalPages" class="form-control"
+                        (change)="goToPage($event)" />
+                </div>
+
             </div>
         </div>
 
         <!-- TABELA -->
-        <div class="table-responsive shadow-sm border rounded">
-            <table class="table table-striped table-hover align-middle mb-0" *ngIf="page.content.length > 0">
+        <div class="table-responsive table-container shadow-sm">
+            <table class="table table-striped table-hover align-middle" *ngIf="page.content.length > 0">
+
                 <thead class="table-primary">
                     <tr>
                         <th style="width: 120px;">ID</th>
                         <th>Título</th>
+
                         <th *ngIf="showFields.description">Descrição</th>
                         <th *ngIf="showFields.owner">Proprietário</th>
                         <th *ngIf="showFields.status">Status</th>
                         <th *ngIf="showFields.createdAt">Criado em</th>
                         <th *ngIf="showFields.updatedAt">Atualizado em</th>
                         <th *ngIf="showFields.tags">Tags</th>
+
                         <th class="text-center">Ações</th>
                     </tr>
                 </thead>
-                <tbody [style.opacity]="loadingService.isLoading() ? '0.5' : '1'">
+
+                <tbody>
                     <tr *ngFor="let doc of documents">
-                        <td><code class="badge bg-danger">{{ doc.id | shortId }}</code></td>
-                        <td class="fw-bold">{{ doc.title }}</td>
-                        <td *ngIf="showFields.description" class="small">{{ doc.description }}</td>
+
+                        <td>
+                            <code class="badge bg-danger" [title]="doc.id"
+                                style="cursor: help;">{{ doc.id | shortId }}</code>
+                        </td>
+
+                        <td>{{ doc.title }}</td>
+
+                        <td *ngIf="showFields.description">{{ doc.description }}</td>
                         <td *ngIf="showFields.owner">{{ doc.owner }}</td>
+
                         <td *ngIf="showFields.status">
                             <span class="badge" [ngClass]="{
-                                'bg-secondary': doc.status === 'DRAFT',
-                                'bg-success': doc.status === 'PUBLISHED',
-                                'bg-warning text-dark': doc.status === 'ARCHIVED'}">
+                        'bg-secondary': doc.status === 'DRAFT',
+                        'bg-success': doc.status === 'PUBLISHED',
+                        'bg-warning text-dark': doc.status === 'ARCHIVED'}">
                                 {{ doc.status }}
                             </span>
                         </td>
-                        <td *ngIf="showFields.createdAt">{{ doc.createdAt | date:'dd/MM HH:mm' }}</td>
-                        <td *ngIf="showFields.updatedAt">{{ doc.updatedAt | date:'dd/MM HH:mm' }}</td>
-                        <td *ngIf="showFields.tags">
-                            <span *ngFor="let t of doc.tags" class="badge bg-info text-dark me-1 small">{{t}}</span>
+
+                        <td *ngIf="showFields.createdAt">
+                            {{ doc.createdAt | date:'dd/MM/yyyy HH:mm' }}
                         </td>
+                        <td *ngIf="showFields.updatedAt">
+                            {{ doc.updatedAt | date:'dd/MM/yyyy HH:mm' }}
+                        </td>
+
+                        <td *ngIf="showFields.tags">
+                            <span *ngFor="let tag of doc.tags || []" class="badge bg-info text-dark me-1">
+                                {{ tag }}
+                            </span>
+                        </td>
+
                         <td class="text-center">
-                            <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-secondary" (click)="viewDocument($event, doc.id)"><i
-                                        class="bi bi-eye"></i></button>
-                                <button class="btn btn-outline-primary" (click)="updateDocument($event, doc.id)"><i
-                                        class="bi bi-pencil"></i></button>
-                                <button class="btn btn-outline-danger" (click)="deleteDocument($event, doc.id)"><i
-                                        class="bi bi-trash"></i></button>
+                            <div class="btn-group" role="group" aria-label="Ações do Documento">
+
+                                <button type="button" class="btn btn-sm btn-outline-secondary" title="Visualizar"
+                                    (click)="viewDocument($event, doc.id)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+
+                                <button type="button" class="btn btn-sm btn-outline-primary" title="Editar"
+                                    (click)="updateDocument($event, doc.id)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <button type="button" class="btn btn-sm btn-outline-danger" title="Excluir"
+                                    (click)="deleteDocument($event, doc.id)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
                             </div>
                         </td>
+
                     </tr>
                 </tbody>
+
             </table>
         </div>
 

@@ -1,55 +1,35 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
-export interface DocumentSearchRequest {
-  title?: string;
-  searchType?: 'CONTAINS' | 'STARTS_WITH';
-  status?: string;
-  owner?: string;
-  createdAfter?: string;
-  createdBefore?: string;
-  updatedAfter?: string;
-  updatedBefore?: string;
-  tags?: string[];
-}
-
-export interface Document {
-  id: string;
-  title: string;
-  description: string;
-  owner: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  tags: string[];
-}
-
-export interface SortOption {
-  field: string;
-  direction: 'asc' | 'desc';
-}
-
-export interface Page<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-}
+// Importações limpas dos nossos modelos centralizados
+import { Document, DocumentSearchRequest } from '../../models/document.model';
+import { Page, SortOption } from '../../models/pagination.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DocumentService {
+  // Padronizamos a URL base para evitar repetição do sufixo /documents
+  private readonly apiUrl = `${environment.apiUrl}/documents`;
 
-  private apiUrl = 'http://localhost:8080';
+  constructor(private httpClient: HttpClient) { }
 
-  constructor(private http: HttpClient) { }
+  /**
+   * Remove um documento permanentemente.
+   * O Token, o Spinner e o Erro são tratados automaticamente pela infraestrutura.
+   */
+  delete(id: string): Observable<void> {
+    return this.httpClient.delete<void>(`${this.apiUrl}/${id}`);
+  }
 
   /**
    * Realiza a busca paginada de documentos com suporte a ordenação múltipla.
-   * Valores padrão: página 0, tamanho 10, ordenado por título ascendente.
+   * @param filters Critérios de busca.
+   * @param page Índice da página (zero-based).
+   * @param size Quantidade de itens por página.
+   * @param sorts Configurações de ordenação.
    */
   search(
     filters: DocumentSearchRequest = {},
@@ -62,13 +42,13 @@ export class DocumentService {
       .set('page', page.toString())
       .set('size', size.toString());
 
-    // Mantendo a lógica de append para múltiplos campos de ordenação
+    // Abordagem limpa para concatenar múltiplos sorts para o Spring Data
     sorts.forEach(s => {
       params = params.append('sort', `${s.field},${s.direction}`);
     });
 
-    return this.http.post<Page<Document>>(
-      `${this.apiUrl}/documents/search`,
+    return this.httpClient.post<Page<Document>>(
+      `${this.apiUrl}/search`,
       filters,
       { params }
     );
