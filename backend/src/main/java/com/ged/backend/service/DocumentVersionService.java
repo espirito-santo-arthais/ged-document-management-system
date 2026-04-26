@@ -23,6 +23,7 @@ import com.ged.backend.repository.DocumentRepository;
 import com.ged.backend.repository.DocumentVersionRepository;
 import com.ged.backend.service.storage.StorageService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,6 +36,7 @@ public class DocumentVersionService {
 	private final DocumentRepository documentRepository;
 	private final StorageService storageService;
 
+	@Transactional
 	public DocumentVersionResponseDTO upload(UUID documentId, MultipartFile file) {
 		log.info("Iniciando upload de versão de documento. DocumentId: {}, File: {}",
 				documentId, file != null ? file.getOriginalFilename() : null);
@@ -180,6 +182,7 @@ public class DocumentVersionService {
 		}
 	}
 
+	@Transactional
 	public void deleteVersion(UUID documentId, Integer version) {
 		log.info("Iniciando exclusão de versão. DocumentId: {}, Version: {}", documentId, version);
 
