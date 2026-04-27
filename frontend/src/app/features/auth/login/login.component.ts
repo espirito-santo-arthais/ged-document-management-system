@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth.service';
-import { LoadingService } from '../../../core/services/loading/loading.service'; 
+import { LoadingService } from '../../../core/services/loading/loading.service';
 
 @Component({
   selector: 'app-login',
@@ -25,13 +25,42 @@ export class LoginComponent {
   onSubmit() {
     this.errorMessage = '';
 
+    const validationError = this.validateForm();
+
+    if (validationError) {
+      this.errorMessage = validationError;
+      return;
+    }
+    
     this.authService.login({ username: this.username, password: this.password }).subscribe({
       next: () => {
-        this.router.navigate(['/home']);
+        this.router.navigate(['/dashboard']);
       },
       error: (err: Error) => {
         this.errorMessage = err.message;
       }
     });
   }
+
+  private validateForm(): string | null {
+
+    if (!this.username && !this.password) {
+      return 'E-mail e senha são obrigatórios';
+    }
+
+    if (!this.username) {
+      return 'E-mail é obrigatório';
+    }
+
+    if (!this.password) {
+      return 'Senha é obrigatória';
+    }
+
+    if (!this.username.includes('@')) {
+      return 'Informe um e-mail válido';
+    }
+
+    return null;
+  }
+
 }
