@@ -12,28 +12,16 @@
       <form (ngSubmit)="onSubmit()">
 
         <!-- ERRO -->
-        <div *ngIf="errorMessage"
-          class="alert alert-danger d-flex align-items-start gap-3 shadow-sm border-0 rounded-3 p-3">
+        <div *ngIf="errorMessage" class="alert alert-danger d-flex align-items-start gap-2">
 
-          <!-- ÍCONE -->
-          <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+          <i class="bi bi-exclamation-triangle-fill fs-5"></i>
 
-          <!-- TEXTO -->
-          <div class="flex-grow-1">
-
-            <div class="fw-bold mb-1">
-              Erro ao autenticar
-            </div>
-
-            <div class="small">
-              {{ errorMessage }}
-            </div>
-
+          <div>
+            <strong>Erro ao autenticar</strong>
+            <div class="small">{{ errorMessage }}</div>
           </div>
 
-          <!-- BOTÃO FECHAR -->
-          <button type="button" class="btn-close" aria-label="Close" (click)="errorMessage = ''">
-          </button>
+          <button type="button" class="btn-close ms-auto" (click)="errorMessage=''"></button>
 
         </div>
 

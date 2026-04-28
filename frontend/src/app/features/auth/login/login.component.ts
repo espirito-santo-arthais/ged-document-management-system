@@ -31,13 +31,13 @@ export class LoginComponent {
       this.errorMessage = validationError;
       return;
     }
-    
+
     this.authService.login({ username: this.username, password: this.password }).subscribe({
       next: () => {
         this.router.navigate(['/dashboard']);
       },
-      error: (err: Error) => {
-        this.errorMessage = err.message;
+      error: (err: any) => {
+        this.errorMessage = err.userMessage || 'Erro ao autenticar.';
       }
     });
   }
