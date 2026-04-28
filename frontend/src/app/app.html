@@ -1,19 +1,7 @@
-<div>
+<app-header></app-header>
 
-  <!-- HEADER GLOBAL -->
-  <nav class="navbar navbar-dark bg-dark px-3">
-
-    <span class="navbar-brand">GED - Document Management System V1.0.0</span>
-
-    <button *ngIf="isLoggedIn()"
-            class="btn btn-outline-light btn-sm"
-            (click)="logout()">
-      Sair
-    </button>
-
-  </nav>
-
-  <!-- CONTEÚDO DAS TELAS -->
+<div class="container-fluid mt-5">
   <router-outlet></router-outlet>
-
 </div>
+
+<app-footer *ngIf="showFooter"></app-footer>

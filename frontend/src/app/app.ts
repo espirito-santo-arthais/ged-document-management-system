@@ -1,30 +1,36 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterOutlet, Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { filter, map, mergeMap } from 'rxjs';
+import { HeaderComponent } from './layout/header/header.component';
+import { FooterComponent } from './layout/footer/footer.component';
 import { CommonModule } from '@angular/common';
-import { AuthService } from 'app/core/services/auth/auth.service';
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, CommonModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
+  showFooter = true;
+  private router = inject(Router);
+  private activatedRoute = inject(ActivatedRoute);
 
- constructor(
-    private authService: AuthService,
-    private router: Router,
-  ) {
+  constructor() {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map(() => this.activatedRoute),
+      map(route => {
+        // Percorre as rotas filhas até encontrar a última ativa
+        while (route.firstChild) route = route.firstChild;
+        return route;
+      }),
+      mergeMap(route => route.data)
+    ).subscribe(data => {
+      // Aqui ele pega o 'showFooter' que você definiu no routes.ts
+      // Se não estiver definido na rota, o padrão será 'true'
+      this.showFooter = data['showFooter'] !== false;
+    });
   }
-
-  isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
-  }
-
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
-  }
-
 }
