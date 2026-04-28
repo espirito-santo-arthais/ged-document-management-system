@@ -19,10 +19,12 @@ import {
   SortOption
 } from '../../core/models/pagination.model';
 
+import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
+
 @Component({
   selector: "app-document-list",
   standalone: true,
-  imports: [CommonModule, FormsModule, ShortIdPipe],
+  imports: [CommonModule, FormsModule, ShortIdPipe, PaginationComponent],
   templateUrl: "./document-list.component.html",
   styleUrls: ["./document-list.component.css"],
 })
@@ -35,7 +37,14 @@ export class DocumentListComponent implements OnInit {
   protected loadingService = inject(LoadingService);
 
   // Estado da Lista
-  page: Page<Document> | null = null;
+  page: Page<Document> = {
+    content: [],
+    totalElements: 0,
+    totalPages: 0,
+    size: 20,
+    number: 0
+  };
+
   documents: Document[] = [];
 
   // Configurações de Exibição
@@ -189,8 +198,21 @@ export class DocumentListComponent implements OnInit {
 
   goToPage(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const value = Number(input.value);
-    if (isNaN(value) || value < 1) return;
+    let value = Number(input.value);
+
+    if (isNaN(value)) return;
+
+    if (value < 1) {
+      value = 1;
+    }
+
+    if (this.page && value > this.page.totalPages) {
+      value = this.page.totalPages;
+    }
+
+    // 🔄 atualiza o input visualmente
+    input.value = value.toString();
+
     this.currentPage = value - 1;
     this.loadPage();
   }
@@ -230,5 +252,16 @@ export class DocumentListComponent implements OnInit {
         console.error('Erro ao deletar:', err.message);
       }
     });
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadPage();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.currentPage = 0;
+    this.loadPage();
   }
 }

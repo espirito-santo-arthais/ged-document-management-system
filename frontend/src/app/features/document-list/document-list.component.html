@@ -177,29 +177,9 @@
         </div>
 
         <!-- PAGINAÇÃO SUPERIOR -->
-        <div *ngIf="page.totalElements > 0" class="d-flex justify-content-between align-items-center mb-3">
-            <div class="d-flex align-items-center gap-3">
-                <span class="small">Mostrando <strong>{{ page.content.length }}</strong> de <strong>{{
-                        page.totalElements }}</strong></span>
-                <select class="form-select form-select-sm" style="width: auto;" [(ngModel)]="pageSize"
-                    (change)="applyFilters()">
-                    <option [value]="10">10</option>
-                    <option [value]="50">50</option>
-                    <option [value]="100">100</option>
-                </select>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <button class="btn btn-sm btn-outline-primary" (click)="prevPage(page)"
-                    [disabled]="page.number === 0 || loadingService.isLoading()">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-                <span class="small">Página {{ page.number + 1 }} de {{ page.totalPages }}</span>
-                <button class="btn btn-sm btn-outline-primary" (click)="nextPage(page)"
-                    [disabled]="page.number + 1 >= page.totalPages || loadingService.isLoading()">
-                    <i class="bi bi-chevron-right"></i>
-                </button>
-            </div>
-        </div>
+        <app-pagination [page]="page" [currentPage]="currentPage" [pageSize]="pageSize"
+            (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+        </app-pagination>
 
         <!-- TABELA -->
         <div class="table-responsive shadow-sm border rounded">
@@ -252,48 +232,9 @@
         </div>
 
         <!-- PAGINAÇÃO INFERIOR -->
-        <div *ngIf="page.totalElements > 0" class="d-flex justify-content-between align-items-center mt-3 mb-3">
-
-            <div class="d-flex align-items-center gap-3">
-                <div>
-                    Mostrando <strong>{{ page.content.length }}</strong> de <strong>{{ page.totalElements }}</strong>
-                    registros
-                </div>
-
-                <div class="input-group input-group-sm" style="width: auto;">
-                    <label class="input-group-text" for="pageSizeSelect">Exibir</label>
-                    <select class="form-select" id="pageSizeSelect" [(ngModel)]="pageSize" (change)="applyFilters()">
-                        <option [value]="10">10</option>
-                        <option [value]="20">20</option>
-                        <option [value]="50">50</option>
-                        <option [value]="100">100</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="d-flex align-items-center gap-2">
-
-                <button class="btn btn-sm btn-outline-primary" (click)="prevPage(page)" [disabled]="page.number === 0">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-
-                <span class="text-muted small">
-                    Página {{ page.number + 1 }} de {{ page.totalPages }}
-                </span>
-
-                <button class="btn btn-sm btn-outline-primary" (click)="nextPage(page)"
-                    [disabled]="page.number + 1 >= page.totalPages">
-                    <i class="bi bi-chevron-right"></i>
-                </button>
-
-                <div class="input-group input-group-sm ms-2" style="width: 120px;">
-                    <span class="input-group-text">Ir:</span>
-                    <input type="number" min="1" [max]="page.totalPages" class="form-control"
-                        (change)="goToPage($event)" />
-                </div>
-
-            </div>
-        </div>
+        <app-pagination [page]="page" [currentPage]="currentPage" [pageSize]="pageSize"
+            (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+        </app-pagination>
 
         <!-- VAZIO -->
         <div *ngIf="page.content.length === 0" class="mt-3">
