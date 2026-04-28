@@ -1,83 +1,84 @@
 <div class="container-fluid p-4">
 
-    <div class="card mb-3 shadow-sm">
-        <div class="card-body">
-            <div
-                class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
-                
-                <h4 class="mb-0">Documentos</h4>
+    <ng-container *ngIf="page">
 
-                <div class="d-flex flex-wrap align-items-center gap-3">
+        <!-- CABEÇALHO -->
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <div
+                    class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
 
-                    <!-- COLUNAS -->
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button"
-                            data-bs-toggle="dropdown">
-                            <i class="bi bi-layout-three-columns"></i> Colunas
-                        </button>
-                        <ul class="dropdown-menu p-3" style="min-width: 200px;">
-                            <li><strong>Exibir:</strong></li>
-                            <li class="form-check">
-                                <input class="form-check-input" type="checkbox" checked disabled>
-                                <label class="form-check-label small text-muted">Título</label>
-                            </li>
-                            <li class="form-check" *ngFor="let item of columnMap | keyvalue">
-                                <input class="form-check-input" type="checkbox"
-                                    [(ngModel)]="$any(showFields)[item.key]">
-                                <label class="form-check-label small">{{ item.value }}</label>
-                            </li>
-                        </ul>
-                    </div>
+                    <h4 class="mb-0">Documentos</h4>
 
-                    <!-- ORDENAÇÂO -->
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button"
-                            data-bs-toggle="dropdown">
-                            <i class="bi bi-sort-alpha-down"></i> Ordenar
-                        </button>
-                        <div class="dropdown-menu p-3" style="min-width: 250px;">
-                            <div class="mb-2"><label class="small fw-bold text-primary">Clique para adicionar à
-                                    fila:</label></div>
-                            <div *ngFor="let field of sortableFields"
-                                class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="small">{{ columnMap[field] || field }}</span>
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-primary py-0"
-                                        (click)="addSort(field, 'asc')">ASC</button>
-                                    <button class="btn btn-outline-primary py-0"
-                                        (click)="addSort(field, 'desc')">DESC</button>
-                                </div>
-                            </div>
-                            <hr class="dropdown-divider">
-                            <div class="small mb-2 fw-bold" *ngIf="activeSorts.length > 0">Fila atual:</div>
-                            <div *ngFor="let s of activeSorts; let i = index"
-                                class="badge bg-light text-dark d-flex justify-content-between align-items-center mb-1 border">
-                                <span>{{i+1}}º: {{ columnMap[s.field] || s.field }} ({{s.direction}})</span>
-                                <i class="bi bi-x-circle text-danger ms-2" style="cursor: pointer;"
-                                    (click)="removeSort(i)"></i>
-                            </div>
-                            <button *ngIf="activeSorts.length > 0" class="btn btn-link btn-sm text-danger p-0 mt-2"
-                                (click)="clearSorts()">Limpar Tudo</button>
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+
+                        <!-- COLUNAS -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button"
+                                data-bs-toggle="dropdown">
+                                <i class="bi bi-layout-three-columns"></i> Colunas
+                            </button>
+                            <ul class="dropdown-menu p-3" style="min-width: 200px;">
+                                <li><strong>Exibir:</strong></li>
+                                <li class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked disabled>
+                                    <label class="form-check-label small text-muted">Título</label>
+                                </li>
+                                <li class="form-check" *ngFor="let item of columnMap | keyvalue">
+                                    <input class="form-check-input" type="checkbox"
+                                        [(ngModel)]="$any(showFields)[item.key]">
+                                    <label class="form-check-label small">{{ item.value }}</label>
+                                </li>
+                            </ul>
                         </div>
-                    </div>
 
-                    <!-- NOVO-->
-                    <button class="btn btn-success btn-sm d-flex align-items-center gap-1"
-                        (click)="createDocument($event)">
-                        <i class="bi bi-plus-lg"></i><span>Novo</span>
-                    </button>
-                    
+                        <!-- ORDENAÇÂO -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button"
+                                data-bs-toggle="dropdown">
+                                <i class="bi bi-sort-alpha-down"></i> Ordenar
+                            </button>
+                            <div class="dropdown-menu p-3" style="min-width: 250px;">
+                                <div class="mb-2"><label class="small fw-bold text-primary">Clique para adicionar à
+                                        fila:</label></div>
+                                <div *ngFor="let field of sortableFields"
+                                    class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="small">{{ columnMap[field] || field }}</span>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary py-0"
+                                            (click)="addSort(field, 'asc')">ASC</button>
+                                        <button class="btn btn-outline-primary py-0"
+                                            (click)="addSort(field, 'desc')">DESC</button>
+                                    </div>
+                                </div>
+                                <hr class="dropdown-divider">
+                                <div class="small mb-2 fw-bold" *ngIf="activeSorts.length > 0">Fila atual:</div>
+                                <div *ngFor="let s of activeSorts; let i = index"
+                                    class="badge bg-light text-dark d-flex justify-content-between align-items-center mb-1 border">
+                                    <span>{{i+1}}º: {{ columnMap[s.field] || s.field }} ({{s.direction}})</span>
+                                    <i class="bi bi-x-circle text-danger ms-2" style="cursor: pointer;"
+                                        (click)="removeSort(i)"></i>
+                                </div>
+                                <button *ngIf="activeSorts.length > 0" class="btn btn-link btn-sm text-danger p-0 mt-2"
+                                    (click)="clearSorts()">Limpar Tudo</button>
+                            </div>
+                        </div>
+
+                        <!-- NOVO-->
+                        <button class="btn btn-success btn-sm d-flex align-items-center gap-1"
+                            (click)="createDocument($event)">
+                            <i class="bi bi-plus-lg"></i><span>Novo</span>
+                        </button>
+
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <ng-container *ngIf="page">
 
         <!-- FILTROS -->
         <div class="card p-3 mb-3 shadow-sm border-start border-primary border-4">
 
-              <!-- FILTROS TEXTUAIS -->
+            <!-- FILTROS TEXTUAIS -->
             <div class="row g-2">
 
                 <!-- TÍTULO + TIPO -->
@@ -92,7 +93,7 @@
                     </div>
                 </div>
 
-                 <!-- STATUS e OWNER -->
+                <!-- STATUS e OWNER -->
                 <div class="col-md-6">
                     <div class="row g-2">
                         <div class="col-md-6">
@@ -111,10 +112,10 @@
 
             </div>
 
-             <!-- DATAS -->
+            <!-- DATAS -->
             <div class="row g-2 mt-2">
 
-                 <!-- createdAt -->
+                <!-- createdAt -->
                 <div class="col-md-6">
                     <div class="row g-2">
                         <div class="col-md-6">
@@ -148,10 +149,10 @@
 
             </div>
 
-              <!-- TAGS e BOTÃO -->
+            <!-- TAGS e BOTÃO -->
             <div class="row g-2 mt-2">
 
-                 <!-- TAGS -->
+                <!-- TAGS -->
                 <div class="col-md-9 pt-2">
                     <div class="input-group input-group-sm">
                         <input class="form-control" placeholder="Adicionar tag" [(ngModel)]="tagInput"
@@ -165,7 +166,7 @@
                     </div>
                 </div>
 
-                 <!-- BOTÃO -->
+                <!-- BOTÃO -->
                 <div class="col-md-3 d-grid">
                     <button class="btn btn-primary" (click)="applyFilters()" [disabled]="loadingService.isLoading()">
                         {{ loadingService.isLoading() ? 'Processando...' : 'Filtrar' }}

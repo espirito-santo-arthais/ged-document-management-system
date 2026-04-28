@@ -1,56 +1,81 @@
-<div class="landing-page">
-  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+<div class="landing-page mt-5 py-5">
+
+  <!-- HERO -->
+  <section class="hero-wrapper py-5">
+
     <div class="container">
-      <a class="navbar-brand fw-bold text-primary" routerLink="/">
-        ARTHAIS <span class="text-dark">GED</span>
-      </a>
-      <div class="d-flex">
-        <a *ngIf="!isLoggedIn()" routerLink="/login" class="btn btn-outline-primary btn-sm me-2">Entrar</a>
-        <a *ngIf="isLoggedIn()" routerLink="/index" class="btn btn-primary btn-sm">Acessar Sistema</a>
-      </div>
-    </div>
-  </nav>
 
-  <header class="hero-section py-5 text-center bg-light">
-    <div class="container py-5">
-      <h1 class="display-4 fw-bold">Gestão Inteligente de Documentos</h1>
-      <p class="lead text-muted mx-auto" style="max-width: 600px;">
-        Organize, localize e proteja os documentos da sua empresa com a eficiência da tecnologia Arthais.
-      </p>
-      <div class="mt-4 d-flex justify-content-center gap-3">
-        <a routerLink="/login" class="btn btn-primary btn-lg px-4 shadow">Começar Agora</a>
-        <button class="btn btn-link text-decoration-none">Saiba mais</button>
-      </div>
-    </div>
-  </header>
+      <div class="hero-box text-center text-light">
 
+        <h1 class="display-5 fw-bold">
+          Gestão Inteligente de Documentos
+        </h1>
+
+        <p class="lead opacity-75 mx-auto" style="max-width: 600px;">
+          Organize, localize e proteja os documentos da sua empresa com eficiência,
+          segurança e performance.
+        </p>
+
+        <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
+
+          <a *ngIf="!isLoggedIn()" routerLink="/login" class="btn btn-light btn-lg px-4 shadow-sm">
+            Entrar
+          </a>
+
+          <a *ngIf="isLoggedIn()" routerLink="/dashboard" class="btn btn-primary btn-lg px-4 shadow">
+            Acessar Sistema
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+  
+  <!-- FEATURES -->
   <section class="container py-5">
-    <div class="row g-4 text-center">
-      <div class="col-md-4">
-        <div class="p-3">
-          <i class="bi bi-shield-lock text-primary fs-1"></i>
-          <h3 class="h5 mt-3">Segurança</h3>
-          <p class="small text-muted">Acesso controlado e criptografia para seus dados sensíveis.</p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="p-3">
-          <i class="bi bi-search text-primary fs-1"></i>
-          <h3 class="h5 mt-3">Busca Ágil</h3>
-          <p class="small text-muted">Filtros avançados e múltiplos critérios de ordenação.</p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="p-3">
-          <i class="bi bi-cloud-check text-primary fs-1"></i>
-          <h3 class="h5 mt-3">Nuvem</h3>
-          <p class="small text-muted">Acesse seus documentos de qualquer lugar, a qualquer hora.</p>
-        </div>
-      </div>
+
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Por que usar o GED?</h2>
+      <p class="text-muted">Tecnologia pensada para ambientes corporativos</p>
     </div>
+
+    <div class="row g-4 text-center">
+
+      <div class="col-md-4">
+        <div class="p-4 h-100 border rounded shadow-sm hover-card">
+          <i class="bi bi-shield-lock text-dark fs-1"></i>
+          <h5 class="mt-3 fw-semibold">Segurança</h5>
+          <p class="small text-muted">
+            Controle de acesso e proteção dos dados críticos da empresa.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="p-4 h-100 border rounded shadow-sm hover-card">
+          <i class="bi bi-search text-dark fs-1"></i>
+          <h5 class="mt-3 fw-semibold">Busca Avançada</h5>
+          <p class="small text-muted">
+            Encontre documentos rapidamente com filtros inteligentes.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="p-4 h-100 border rounded shadow-sm hover-card">
+          <i class="bi bi-cloud-check text-dark fs-1"></i>
+          <h5 class="mt-3 fw-semibold">Acesso em Nuvem</h5>
+          <p class="small text-muted">
+            Disponibilidade total, em qualquer lugar e a qualquer momento.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
   </section>
 
-  <footer class="py-4 text-center border-top">
-    <p class="text-muted small">&copy; 2026 Minha Empresa - Todos os direitos reservados.</p>
-  </footer>
 </div>
