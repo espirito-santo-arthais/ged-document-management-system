@@ -23,8 +23,8 @@
                                 <li class="dropdown-header"> Exibir: </li>
                                 <li class="form-check" *ngFor="let col of columns" [class.text-muted]="col.required">
                                     <input class="form-check-input" type="checkbox"
-                                        [(ngModel)]="$any(showFields)[col.key]" [disabled]="!!col.required"
-                                        (click)="$event.stopPropagation()">
+                                        [(ngModel)]="$any(showFields)[col.key]" (ngModelChange)="onColumnChange()"
+                                        [disabled]="!!col.required" (click)="$event.stopPropagation()">
                                     <label class="form-check-label small" [class.opacity-75]="col.required"
                                         (click)="$event.stopPropagation()">
                                         {{ col.label }}
