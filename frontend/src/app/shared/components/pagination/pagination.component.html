@@ -1,0 +1,81 @@
+<div *ngIf="page.totalElements > 0" class="d-flex justify-content-between align-items-center mt-3 mb-3">
+
+    <!-- ESQUERDA -->
+    <div class="d-flex align-items-center gap-3">
+
+        <div>
+            Mostrando <strong>{{ page.content.length }}</strong>
+            de <strong>{{ page.totalElements }}</strong> registros
+        </div>
+
+        <!-- SPINNER GLOBAL -->
+        <span *ngIf="loadingService.isLoading()" class="spinner-border spinner-border-sm text-primary">
+        </span>
+
+        <!-- PAGE SIZE -->
+        <div class="input-group input-group-sm" style="width: auto;">
+            <label class="input-group-text">Exibir</label>
+
+            <select class="form-select" [ngModel]="pageSize" (ngModelChange)="changePageSize($event)"
+                [disabled]="loadingService.isLoading()">
+
+                <option [value]="10">10</option>
+                <option [value]="20">20</option>
+                <option [value]="50">50</option>
+                <option [value]="100">100</option>
+
+            </select>
+        </div>
+
+    </div>
+
+    <!-- DIREITA -->
+    <div class="d-flex align-items-center gap-2">
+
+        <!-- PREV -->
+        <button class="btn btn-sm btn-outline-primary d-flex align-items-center justify-content-center" (click)="prev()"
+            [disabled]="currentPage === 0 || loadingService.isLoading()" style="min-width: 36px;"
+            title="Página anterior" aria-label="Página anterior">
+
+            <i class="bi bi-chevron-left"></i>
+
+        </button>
+
+        <!-- PAGE INFO -->
+        <span class="text-muted small">
+            Página {{ currentPage + 1 }} de {{ page.totalPages }}
+        </span>
+
+        <!-- NEXT -->
+        <button class="btn btn-sm btn-outline-primary d-flex align-items-center justify-content-center" (click)="next()"
+            [disabled]="currentPage + 1 >= page.totalPages || loadingService.isLoading()" style="min-width: 36px;"
+            title="Próxima página" aria-label="Próxima página">
+
+            <i class="bi bi-chevron-right"></i>
+
+        </button>
+
+        <!-- GO TO PAGE -->
+        <div class="input-group input-group-sm ms-2" style="width: 140px;">
+
+            <input type="number" min="1" [max]="page.totalPages" class="form-control" [(ngModel)]="pageInput"
+                [disabled]="loadingService.isLoading()" (keyup.enter)="goToPage()" (ngModelChange)="onInputChange()" />
+
+            <button class=" btn btn-success d-flex align-items-center justify-content-center" (click)="go()"
+                [disabled]="loadingService.isLoading()" style="min-width: 42px;" title="Ir para página"
+                aria-label="Ir para página">
+
+            <!-- SPINNER LOCAL -->
+            <span *ngIf="loadingService.isLoading()" class="spinner-border spinner-border-sm">
+            </span>
+
+            <!-- ÍCONE -->
+            <i *ngIf="!loadingService.isLoading()" class="bi bi-arrow-right">
+            </i>
+
+            </button>
+
+        </div>
+
+    </div>
+</div>

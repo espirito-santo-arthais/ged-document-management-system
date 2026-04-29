@@ -1,0 +1,4 @@
+- [BACK] Gestão de usuários e permissões;
+- [FRONT] Storage de preferências por usuário e funcionalidade no backend, cross browsers e cross maquina.
+- [FRONT] Implementar o sistema de controle de erros com I18N e outros recursos.
+-  

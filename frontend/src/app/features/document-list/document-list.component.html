@@ -1,83 +1,135 @@
 <div class="container-fluid p-4">
 
-    <div class="card mb-3 shadow-sm">
-        <div class="card-body">
-            <div
-                class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
-                
-                <h4 class="mb-0">Documentos</h4>
+    <ng-container *ngIf="page">
 
-                <div class="d-flex flex-wrap align-items-center gap-3">
+        <!-- CABEÇALHO -->
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <div
+                    class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
 
-                    <!-- COLUNAS -->
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button"
-                            data-bs-toggle="dropdown">
-                            <i class="bi bi-layout-three-columns"></i> Colunas
-                        </button>
-                        <ul class="dropdown-menu p-3" style="min-width: 200px;">
-                            <li><strong>Exibir:</strong></li>
-                            <li class="form-check">
-                                <input class="form-check-input" type="checkbox" checked disabled>
-                                <label class="form-check-label small text-muted">Título</label>
-                            </li>
-                            <li class="form-check" *ngFor="let item of columnMap | keyvalue">
-                                <input class="form-check-input" type="checkbox"
-                                    [(ngModel)]="$any(showFields)[item.key]">
-                                <label class="form-check-label small">{{ item.value }}</label>
-                            </li>
-                        </ul>
-                    </div>
+                    <h4 class="mb-0">Documentos</h4>
 
-                    <!-- ORDENAÇÂO -->
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button"
-                            data-bs-toggle="dropdown">
-                            <i class="bi bi-sort-alpha-down"></i> Ordenar
-                        </button>
-                        <div class="dropdown-menu p-3" style="min-width: 250px;">
-                            <div class="mb-2"><label class="small fw-bold text-primary">Clique para adicionar à
-                                    fila:</label></div>
-                            <div *ngFor="let field of sortableFields"
-                                class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="small">{{ columnMap[field] || field }}</span>
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-primary py-0"
-                                        (click)="addSort(field, 'asc')">ASC</button>
-                                    <button class="btn btn-outline-primary py-0"
-                                        (click)="addSort(field, 'desc')">DESC</button>
-                                </div>
-                            </div>
-                            <hr class="dropdown-divider">
-                            <div class="small mb-2 fw-bold" *ngIf="activeSorts.length > 0">Fila atual:</div>
-                            <div *ngFor="let s of activeSorts; let i = index"
-                                class="badge bg-light text-dark d-flex justify-content-between align-items-center mb-1 border">
-                                <span>{{i+1}}º: {{ columnMap[s.field] || s.field }} ({{s.direction}})</span>
-                                <i class="bi bi-x-circle text-danger ms-2" style="cursor: pointer;"
-                                    (click)="removeSort(i)"></i>
-                            </div>
-                            <button *ngIf="activeSorts.length > 0" class="btn btn-link btn-sm text-danger p-0 mt-2"
-                                (click)="clearSorts()">Limpar Tudo</button>
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+
+                        <!-- COLUNAS -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button"
+                                data-bs-toggle="dropdown">
+                                <i class="bi bi-layout-three-columns"></i> Colunas
+                            </button>
+                            <ul class="dropdown-menu p-3" style="min-width: 200px;" data-bs-auto-close="outside"
+                                (click)="$event.stopPropagation()">
+                                <li class="dropdown-header"> Exibir: </li>
+                                <li class="form-check" *ngFor="let col of columns" [class.text-muted]="col.required">
+                                    <input class="form-check-input" type="checkbox"
+                                        [(ngModel)]="$any(showFields)[col.key]" (ngModelChange)="onColumnChange()"
+                                        [disabled]="!!col.required" (click)="$event.stopPropagation()">
+                                    <label class="form-check-label small" [class.opacity-75]="col.required"
+                                        (click)="$event.stopPropagation()">
+                                        {{ col.label }}
+                                        <span *ngIf="col.required">*</span>
+                                    </label>
+                                </li>
+                            </ul>
                         </div>
+
+                        <!-- ORDENAÇÂO -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button"
+                                data-bs-toggle="dropdown">
+
+                                <i class="bi bi-sort-alpha-down"></i> Ordenar
+                            </button>
+
+                            <ul class="dropdown-menu p-3" style="min-width: 250px;" data-bs-auto-close="outside"
+                                (click)="$event.stopPropagation()">
+
+                                <!-- TÍTULO -->
+                                <li class="mb-2">
+                                    <label class="small fw-bold text-primary">
+                                        Clique para adicionar à fila:
+                                    </label>
+                                </li>
+
+                                <!-- CAMPOS -->
+                                <li *ngFor="let field of sortableFields"
+                                    class="d-flex justify-content-between align-items-center mb-1">
+
+                                    <span class="small">
+                                        {{ columnMap[field] || field }}
+                                    </span>
+
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary py-0"
+                                            (click)="addSort(field, 'asc'); $event.stopPropagation()">
+                                            ASC
+                                        </button>
+
+                                        <button class="btn btn-outline-primary py-0"
+                                            (click)="addSort(field, 'desc'); $event.stopPropagation()">
+                                            DESC
+                                        </button>
+                                    </div>
+
+                                </li>
+
+                                <!-- DIVISOR -->
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                <!-- FILA ATUAL -->
+                                <li *ngIf="activeSorts.length > 0" class="small mb-2 fw-bold">
+
+                                    Fila atual:
+                                </li>
+
+                                <!-- ITENS DA FILA -->
+                                <li *ngFor="let s of activeSorts; let i = index" class="mb-1">
+
+                                    <div
+                                        class="badge bg-light text-dark d-flex justify-content-between align-items-center border w-100">
+
+                                        <span>
+                                            {{i+1}}º: {{ columnMap[s.field] || s.field }} ({{s.direction}})
+                                        </span>
+
+                                        <i class="bi bi-x-circle text-danger ms-2" style="cursor: pointer;"
+                                            (click)="removeSort(i); $event.stopPropagation()">
+                                        </i>
+
+                                    </div>
+
+                                </li>
+
+                                <!-- LIMPAR -->
+                                <li *ngIf="activeSorts.length > 0">
+                                    <button class="btn btn-link btn-sm text-danger p-0 mt-2"
+                                        (click)="clearSorts(); $event.stopPropagation()">
+                                        Limpar Tudo
+                                    </button>
+                                </li>
+
+                            </ul>
+                        </div>
+
+                        <!-- NOVO-->
+                        <button class="btn btn-success btn-sm d-flex align-items-center gap-1"
+                            (click)="createDocument($event)">
+                            <i class="bi bi-plus-lg"></i><span>Novo</span>
+                        </button>
+
                     </div>
 
-                    <!-- NOVO-->
-                    <button class="btn btn-success btn-sm d-flex align-items-center gap-1"
-                        (click)="createDocument($event)">
-                        <i class="bi bi-plus-lg"></i><span>Novo</span>
-                    </button>
-                    
                 </div>
             </div>
         </div>
-    </div>
-
-    <ng-container *ngIf="page">
 
         <!-- FILTROS -->
         <div class="card p-3 mb-3 shadow-sm border-start border-primary border-4">
 
-              <!-- FILTROS TEXTUAIS -->
+            <!-- FILTROS TEXTUAIS -->
             <div class="row g-2">
 
                 <!-- TÍTULO + TIPO -->
@@ -92,7 +144,7 @@
                     </div>
                 </div>
 
-                 <!-- STATUS e OWNER -->
+                <!-- STATUS e OWNER -->
                 <div class="col-md-6">
                     <div class="row g-2">
                         <div class="col-md-6">
@@ -111,10 +163,10 @@
 
             </div>
 
-             <!-- DATAS -->
+            <!-- DATAS -->
             <div class="row g-2 mt-2">
 
-                 <!-- createdAt -->
+                <!-- createdAt -->
                 <div class="col-md-6">
                     <div class="row g-2">
                         <div class="col-md-6">
@@ -148,10 +200,10 @@
 
             </div>
 
-              <!-- TAGS e BOTÃO -->
+            <!-- TAGS e BOTÃO -->
             <div class="row g-2 mt-2">
 
-                 <!-- TAGS -->
+                <!-- TAGS -->
                 <div class="col-md-9 pt-2">
                     <div class="input-group input-group-sm">
                         <input class="form-control" placeholder="Adicionar tag" [(ngModel)]="tagInput"
@@ -165,7 +217,7 @@
                     </div>
                 </div>
 
-                 <!-- BOTÃO -->
+                <!-- BOTÃO -->
                 <div class="col-md-3 d-grid">
                     <button class="btn btn-primary" (click)="applyFilters()" [disabled]="loadingService.isLoading()">
                         {{ loadingService.isLoading() ? 'Processando...' : 'Filtrar' }}
@@ -176,29 +228,9 @@
         </div>
 
         <!-- PAGINAÇÃO SUPERIOR -->
-        <div *ngIf="page.totalElements > 0" class="d-flex justify-content-between align-items-center mb-3">
-            <div class="d-flex align-items-center gap-3">
-                <span class="small">Mostrando <strong>{{ page.content.length }}</strong> de <strong>{{
-                        page.totalElements }}</strong></span>
-                <select class="form-select form-select-sm" style="width: auto;" [(ngModel)]="pageSize"
-                    (change)="applyFilters()">
-                    <option [value]="10">10</option>
-                    <option [value]="50">50</option>
-                    <option [value]="100">100</option>
-                </select>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <button class="btn btn-sm btn-outline-primary" (click)="prevPage(page)"
-                    [disabled]="page.number === 0 || loadingService.isLoading()">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-                <span class="small">Página {{ page.number + 1 }} de {{ page.totalPages }}</span>
-                <button class="btn btn-sm btn-outline-primary" (click)="nextPage(page)"
-                    [disabled]="page.number + 1 >= page.totalPages || loadingService.isLoading()">
-                    <i class="bi bi-chevron-right"></i>
-                </button>
-            </div>
-        </div>
+        <app-pagination [page]="page" [currentPage]="currentPage" [pageSize]="pageSize"
+            (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+        </app-pagination>
 
         <!-- TABELA -->
         <div class="table-responsive shadow-sm border rounded">
@@ -208,8 +240,8 @@
                         <th style="width: 120px;">ID</th>
                         <th>Título</th>
                         <th *ngIf="showFields.description">Descrição</th>
-                        <th *ngIf="showFields.owner">Proprietário</th>
                         <th *ngIf="showFields.status">Status</th>
+                        <th *ngIf="showFields.owner">Proprietário</th>
                         <th *ngIf="showFields.createdAt">Criado em</th>
                         <th *ngIf="showFields.updatedAt">Atualizado em</th>
                         <th *ngIf="showFields.tags">Tags</th>
@@ -218,10 +250,9 @@
                 </thead>
                 <tbody [style.opacity]="loadingService.isLoading() ? '0.5' : '1'">
                     <tr *ngFor="let doc of documents">
-                        <td><code class="badge bg-danger">{{ doc.id | shortId }}</code></td>
+                        <td> <code class="badge bg-danger" [title]="doc.id">{{ doc.id | shortId }}</code></td>
                         <td class="fw-bold">{{ doc.title }}</td>
                         <td *ngIf="showFields.description" class="small">{{ doc.description }}</td>
-                        <td *ngIf="showFields.owner">{{ doc.owner }}</td>
                         <td *ngIf="showFields.status">
                             <span class="badge" [ngClass]="{
                                 'bg-secondary': doc.status === 'DRAFT',
@@ -230,8 +261,9 @@
                                 {{ doc.status }}
                             </span>
                         </td>
-                        <td *ngIf="showFields.createdAt">{{ doc.createdAt | date:'dd/MM HH:mm' }}</td>
-                        <td *ngIf="showFields.updatedAt">{{ doc.updatedAt | date:'dd/MM HH:mm' }}</td>
+                        <td *ngIf="showFields.owner">{{ doc.owner }}</td>
+                        <td *ngIf="showFields.createdAt">{{ doc.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                        <td *ngIf="showFields.updatedAt">{{ doc.updatedAt | date:'dd/MM/yyyy HH:mm' }}</td>
                         <td *ngIf="showFields.tags">
                             <span *ngFor="let t of doc.tags" class="badge bg-info text-dark me-1 small">{{t}}</span>
                         </td>
@@ -251,48 +283,9 @@
         </div>
 
         <!-- PAGINAÇÃO INFERIOR -->
-        <div *ngIf="page.totalElements > 0" class="d-flex justify-content-between align-items-center mt-3 mb-3">
-
-            <div class="d-flex align-items-center gap-3">
-                <div>
-                    Mostrando <strong>{{ page.content.length }}</strong> de <strong>{{ page.totalElements }}</strong>
-                    registros
-                </div>
-
-                <div class="input-group input-group-sm" style="width: auto;">
-                    <label class="input-group-text" for="pageSizeSelect">Exibir</label>
-                    <select class="form-select" id="pageSizeSelect" [(ngModel)]="pageSize" (change)="applyFilters()">
-                        <option [value]="10">10</option>
-                        <option [value]="20">20</option>
-                        <option [value]="50">50</option>
-                        <option [value]="100">100</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="d-flex align-items-center gap-2">
-
-                <button class="btn btn-sm btn-outline-primary" (click)="prevPage(page)" [disabled]="page.number === 0">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-
-                <span class="text-muted small">
-                    Página {{ page.number + 1 }} de {{ page.totalPages }}
-                </span>
-
-                <button class="btn btn-sm btn-outline-primary" (click)="nextPage(page)"
-                    [disabled]="page.number + 1 >= page.totalPages">
-                    <i class="bi bi-chevron-right"></i>
-                </button>
-
-                <div class="input-group input-group-sm ms-2" style="width: 120px;">
-                    <span class="input-group-text">Ir:</span>
-                    <input type="number" min="1" [max]="page.totalPages" class="form-control"
-                        (change)="goToPage($event)" />
-                </div>
-
-            </div>
-        </div>
+        <app-pagination [page]="page" [currentPage]="currentPage" [pageSize]="pageSize"
+            (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+        </app-pagination>
 
         <!-- VAZIO -->
         <div *ngIf="page.content.length === 0" class="mt-3">

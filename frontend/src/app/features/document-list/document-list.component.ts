@@ -3,51 +3,83 @@ import { Router } from '@angular/router';
 import { CommonModule } from "@angular/common";
 import { FormsModule } from '@angular/forms';
 
-// SHARED & CORE
 import { ShortIdPipe } from '../../shared/pipes/short-id-pipe';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { LoadingService } from '../../core/services/loading/loading.service';
 import { DocumentService } from '../../core/services/document/document.service';
 
-// MODELS - IMPORTAÇÃO CORRETA DOS MODELOS
-import {
-  Document,
-  DocumentSearchRequest
-} from '../../core/models/document.model';
-import {
-  Page,
-  SortOption
-} from '../../core/models/pagination.model';
+import { Document, DocumentSearchRequest } from '../../core/models/document.model';
+import { Page, SortOption } from '../../core/models/pagination.model';
+
+import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
+import { LocalStorageUtil } from '../../core/utils/local-storage.util';
+
+type DocumentListPreferences = {
+  showFields: {
+    title: boolean;
+    description: boolean;
+    status: boolean;
+    owner: boolean;
+    createdAt: boolean;
+    updatedAt: boolean;
+    tags: boolean;
+  };
+  activeSorts: SortOption[];
+  pageSize: number;
+};
 
 @Component({
   selector: "app-document-list",
   standalone: true,
-  imports: [CommonModule, FormsModule, ShortIdPipe],
+  imports: [CommonModule, FormsModule, ShortIdPipe, PaginationComponent],
   templateUrl: "./document-list.component.html",
   styleUrls: ["./document-list.component.css"],
 })
 export class DocumentListComponent implements OnInit {
-  // Injeções Modernas
+
+  // Injeções
+
   private authService = inject(AuthService);
   private router = inject(Router);
   private documentService = inject(DocumentService);
   private cdr = inject(ChangeDetectorRef);
   protected loadingService = inject(LoadingService);
 
-  // Estado da Lista
-  page: Page<Document> | null = null;
+  private readonly STORAGE_KEY = 'document-list-preferences';
+
+  // Estado
+
+  page: Page<Document> = {
+    content: [],
+    totalElements: 0,
+    totalPages: 0,
+    size: 20,
+    number: 0
+  };
+
   documents: Document[] = [];
 
-  // Configurações de Exibição
+  // Configurações de exibição
+
   showFields = {
-    Title: true,
-    description: true,
+    title: true, // sempre true
+    description: false,
     status: true,
-    owner: true,
-    createdAt: true,
-    updatedAt: true,
+    owner: false,
+    createdAt: false,
+    updatedAt: false,
     tags: true
   };
+
+  columns = [
+    { key: 'title', label: 'Título', required: true },
+    { key: 'description', label: 'Descrição' },
+    { key: 'status', label: 'Status' },
+    { key: 'owner', label: 'Proprietário' },
+    { key: 'createdAt', label: 'Criado em' },
+    { key: 'updatedAt', label: 'Atualizado em' },
+    { key: 'tags', label: 'Tags' }
+  ];
 
   columnMap: { [key: string]: string } = {
     'title': 'Título',
@@ -59,9 +91,10 @@ export class DocumentListComponent implements OnInit {
   };
 
   sortableFields = Object.keys(this.columnMap);
-  activeSorts: SortOption[] = [];
+  activeSorts: SortOption[] = [{ field: 'title', direction: 'asc' }];
 
   // Filtros
+
   filters: DocumentSearchRequest = {
     title: '',
     searchType: 'CONTAINS',
@@ -75,30 +108,59 @@ export class DocumentListComponent implements OnInit {
   };
 
   tagInput = '';
+
+  // Paginação
+
   currentPage = 0;
   pageSize = 20;
 
+  // Lifecycle
+
   ngOnInit(): void {
+    this.loadPreferences();
     this.loadPage();
   }
 
-  // =========================================
-  // ORDENAÇÃO (SORT)
-  // =========================================
+  // Eventos de UI (ações do usuário)
+
+  onColumnChange(): void {
+    this.savePreferences();
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadPage();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.currentPage = 0;
+
+    this.savePreferences();
+    this.loadPage();
+  }
+
+  // Ordenação
 
   addSort(field: string, direction: 'asc' | 'desc'): void {
     this.activeSorts = this.activeSorts.filter(s => s.field !== field);
     this.activeSorts.push({ field, direction });
+
+    this.savePreferences();
     this.loadPage();
   }
 
   removeSort(index: number): void {
     this.activeSorts.splice(index, 1);
+
+    this.savePreferences();
     this.loadPage();
   }
 
   clearSorts(): void {
     this.activeSorts = [];
+
+    this.savePreferences();
     this.loadPage();
   }
 
@@ -117,9 +179,8 @@ export class DocumentListComponent implements OnInit {
     this.applyFilters();
   }
 
-  // =========================================
-  // TAGS
-  // =========================================
+  // Tags
+
   addTag(): void {
     const value = this.tagInput.trim();
     if (value && !this.filters.tags?.includes(value)) {
@@ -133,9 +194,13 @@ export class DocumentListComponent implements OnInit {
     this.filters.tags = this.filters.tags?.filter(t => t !== tag);
   }
 
-  // =========================================
-  // FILTERS & PAGINAÇÃO
-  // =========================================
+  // Filtros e busca
+
+  applyFilters(): void {
+    this.currentPage = 0;
+    this.loadPage();
+  }
+
   private buildFilters(): DocumentSearchRequest {
     const f: DocumentSearchRequest = { ...this.filters };
 
@@ -151,29 +216,7 @@ export class DocumentListComponent implements OnInit {
     return f;
   }
 
-  loadPage(): void {
-    this.documentService.search(
-      this.buildFilters(),
-      this.currentPage,
-      this.pageSize,
-      this.activeSorts
-    ).subscribe({
-      next: (page) => {
-        this.page = page;
-        this.documents = page.content;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        // Erro já vem formatado pelo interceptor
-        console.error('Erro na busca:', err.message);
-      }
-    });
-  }
-
-  applyFilters(): void {
-    this.currentPage = 0;
-    this.loadPage();
-  }
+  // Paginação (controle)
 
   nextPage(page: Page<Document>): void {
     if (page.number + 1 >= page.totalPages) return;
@@ -189,15 +232,27 @@ export class DocumentListComponent implements OnInit {
 
   goToPage(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const value = Number(input.value);
-    if (isNaN(value) || value < 1) return;
+    let value = Number(input.value);
+
+    if (isNaN(value)) return;
+
+    if (value < 1) {
+      value = 1;
+    }
+
+    if (this.page && value > this.page.totalPages) {
+      value = this.page.totalPages;
+    }
+
+    // atualiza o input visualmente
+    input.value = value.toString();
+
     this.currentPage = value - 1;
     this.loadPage();
   }
 
-  // =========================================
-  // AÇÕES
-  // =========================================
+  // Ações de negócio (CRUD / navegação)
+
   createDocument(event: Event): void {
     this.router.navigate(['/documents/new']);
   }
@@ -231,4 +286,52 @@ export class DocumentListComponent implements OnInit {
       }
     });
   }
+
+  // Carga de dados
+
+  loadPage(): void {
+    this.documentService.search(
+      this.buildFilters(),
+      this.currentPage,
+      this.pageSize,
+      this.activeSorts
+    ).subscribe({
+      next: (page) => {
+        this.page = page;
+        this.documents = page.content;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        // Erro já vem formatado pelo interceptor
+        console.error('Erro na busca:', err.message);
+      }
+    });
+  }
+
+  // Persistência (localStorage)
+
+  private loadPreferences(): void {
+    const prefs = LocalStorageUtil.get<DocumentListPreferences>(this.STORAGE_KEY);
+
+    if (!prefs) return;
+
+    this.showFields = {
+      ...this.showFields,
+      ...prefs.showFields
+    };
+
+    this.activeSorts = prefs.activeSorts || [];
+    this.pageSize = prefs.pageSize || this.pageSize;
+  }
+
+  private savePreferences(): void {
+    const preferences: DocumentListPreferences = {
+      showFields: this.showFields,
+      activeSorts: this.activeSorts,
+      pageSize: this.pageSize
+    };
+
+    LocalStorageUtil.set(this.STORAGE_KEY, preferences);
+  }
+
 }

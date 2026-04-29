@@ -4,24 +4,44 @@
     flex-direction: column;
 }
 
-.hero-section {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-bottom: 1px solid #dee2e6;
+/* HERO NOVO */
+.hero-wrapper {
+    background: #f8f9fa;
 }
 
-.navbar-brand {
-    letter-spacing: 1px;
+.hero-box {
+    background: linear-gradient(135deg, #212529, #343a40);
+    color: white;
+    border-radius: 16px;
+    padding: 60px 30px;
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease-in-out;
 }
 
-.hero-section h1 {
-    color: #212529;
+/* leve interação */
+.hero-box:hover {
+    transform: translateY(-3px);
 }
 
+/* responsivo */
+@media (min-width: 768px) {
+    .hero-box {
+        padding: 80px 60px;
+    }
+}
+
+/* ICONES */
 i.bi {
     display: block;
     margin-bottom: 1rem;
 }
 
-footer {
-    margin-top: auto;
+/* CARDS */
+.hover-card {
+    transition: all 0.2s ease-in-out;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }

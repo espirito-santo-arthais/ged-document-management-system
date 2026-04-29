@@ -1,0 +1,53 @@
+.login-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 10px;
+}
+
+/* Inputs mais suaves */
+.form-control {
+    border-radius: 8px;
+}
+
+/* Botão mais consistente com header escuro */
+.btn-dark {
+    background-color: #212529;
+    border-color: #212529;
+}
+
+.btn-dark:hover {
+    background-color: #343a40;
+    border-color: #343a40;
+}
+
+.login-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 10px;
+}
+
+/* Inputs mais suaves */
+.form-control {
+    border-radius: 8px;
+}
+
+/* Botão mais consistente com header escuro */
+.btn-dark {
+    background-color: #212529;
+    border-color: #212529;
+}
+
+.btn-dark:hover {
+    background-color: #343a40;
+    border-color: #343a40;
+}

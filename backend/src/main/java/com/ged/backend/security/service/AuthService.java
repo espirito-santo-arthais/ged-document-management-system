@@ -21,7 +21,7 @@ public class AuthService {
 		log.info("Tentativa de autenticação para usuário: {}", request.getUsername());
 
 		// 🔹 Usuário ADMIN
-		if ("admin".equals(request.getUsername()) &&
+		if ("admin@ged.com.br".equals(request.getUsername()) &&
 				"admin123".equals(request.getPassword())) {
 
 			String token = jwtService.generateToken("admin", "ADMIN");
@@ -35,7 +35,7 @@ public class AuthService {
 		}
 
 		// 🔹 Usuário USER
-		if ("user".equals(request.getUsername()) &&
+		if ("user@ged.com.br".equals(request.getUsername()) &&
 				"user123".equals(request.getPassword())) {
 
 			String token = jwtService.generateToken("user", "USER");
