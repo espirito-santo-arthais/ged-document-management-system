@@ -57,7 +57,7 @@ class AuthControllerIT {
 
 			String body = """
 					{
-					    "username": "admin",
+					    "username": "admin@ged.com.br",
 					    "password": "admin123"
 					}
 					""";
@@ -76,7 +76,7 @@ class AuthControllerIT {
 
 			String body = """
 					{
-					    "username": "user",
+					    "username": "user@ged.com.br",
 					    "password": "user123"
 					}
 					""";
@@ -103,7 +103,7 @@ class AuthControllerIT {
 
 			String body = """
 					{
-					    "username": "admin",
+					    "username": "admin@ged.com.br",
 					    "password": "senhaErrada"
 					}
 					""";

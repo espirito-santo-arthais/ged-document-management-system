@@ -94,7 +94,7 @@ class DocumentControllerIT {
 		@DisplayName("Deve permitir acesso com token válido (ADMIN)")
 		void shouldAllowAccessWithAdminToken() throws Exception {
 
-			String token = getToken("admin", "admin123");
+			String token = getToken("admin@ged.com.br", "admin123");
 
 			mockMvc.perform(post("/documents/search")
 					.header("Authorization", "Bearer " + token)
@@ -107,7 +107,7 @@ class DocumentControllerIT {
 		@DisplayName("Deve permitir acesso com token válido (USER)")
 		void shouldAllowAccessWithUserToken() throws Exception {
 
-			String token = getToken("user", "user123");
+			String token = getToken("user@ged.com.br", "user123");
 
 			mockMvc.perform(post("/documents/search")
 					.header("Authorization", "Bearer " + token)
@@ -128,7 +128,7 @@ class DocumentControllerIT {
 		@DisplayName("USER não deve conseguir criar documento (403)")
 		void userShouldNotCreateDocument() throws Exception {
 
-			String token = getToken("user", "user123");
+			String token = getToken("user@ged.com.br", "user123");
 
 			String body = """
 					{
@@ -150,7 +150,7 @@ class DocumentControllerIT {
 		@DisplayName("ADMIN deve conseguir criar documento")
 		void adminShouldCreateDocument() throws Exception {
 
-			String token = getToken("admin", "admin123");
+			String token = getToken("admin@ged.com.br", "admin123");
 
 			String body = """
 					{

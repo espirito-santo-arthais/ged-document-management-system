@@ -103,7 +103,7 @@ class DocumentVersionControllerIT {
 	@DisplayName("ADMIN deve conseguir fazer upload de versão")
 	void shouldUploadVersion() throws Exception {
 
-		String token = getToken("admin", "admin123");
+		String token = getToken("admin@ged.com.br", "admin123");
 		UUID documentId = createDocument(token);
 
 		MockMultipartFile file = new MockMultipartFile(
@@ -122,7 +122,7 @@ class DocumentVersionControllerIT {
 	@DisplayName("Deve listar versões")
 	void shouldListVersions() throws Exception {
 
-		String token = getToken("admin", "admin123");
+		String token = getToken("admin@ged.com.br", "admin123");
 		UUID documentId = createDocument(token);
 
 		mockMvc.perform(get(DOCUMENTS_URL + "/{id}/versions", documentId)
