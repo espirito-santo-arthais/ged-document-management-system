@@ -194,6 +194,10 @@ export class DocumentListComponent implements OnInit {
     this.filters.tags = this.filters.tags?.filter(t => t !== tag);
   }
 
+  clearTags(): void {
+    this.filters.tags = [];
+  }
+  
   // Filtros e busca
 
   applyFilters(): void {
