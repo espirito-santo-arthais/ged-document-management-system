@@ -18,16 +18,18 @@
                                 data-bs-toggle="dropdown">
                                 <i class="bi bi-layout-three-columns"></i> Colunas
                             </button>
-                            <ul class="dropdown-menu p-3" style="min-width: 200px;">
-                                <li><strong>Exibir:</strong></li>
-                                <li class="form-check">
-                                    <input class="form-check-input" type="checkbox" checked disabled>
-                                    <label class="form-check-label small text-muted">Título</label>
-                                </li>
-                                <li class="form-check" *ngFor="let item of columnMap | keyvalue">
+                            <ul class="dropdown-menu p-3" style="min-width: 200px;" data-bs-auto-close="outside"
+                                (click)="$event.stopPropagation()">
+                                <li class="dropdown-header"> Exibir: </li>
+                                <li class="form-check" *ngFor="let col of columns" [class.text-muted]="col.required">
                                     <input class="form-check-input" type="checkbox"
-                                        [(ngModel)]="$any(showFields)[item.key]">
-                                    <label class="form-check-label small">{{ item.value }}</label>
+                                        [(ngModel)]="$any(showFields)[col.key]" [disabled]="!!col.required"
+                                        (click)="$event.stopPropagation()">
+                                    <label class="form-check-label small" [class.opacity-75]="col.required"
+                                        (click)="$event.stopPropagation()">
+                                        {{ col.label }}
+                                        <span *ngIf="col.required">*</span>
+                                    </label>
                                 </li>
                             </ul>
                         </div>
@@ -36,32 +38,80 @@
                         <div class="dropdown">
                             <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button"
                                 data-bs-toggle="dropdown">
+
                                 <i class="bi bi-sort-alpha-down"></i> Ordenar
                             </button>
-                            <div class="dropdown-menu p-3" style="min-width: 250px;">
-                                <div class="mb-2"><label class="small fw-bold text-primary">Clique para adicionar à
-                                        fila:</label></div>
-                                <div *ngFor="let field of sortableFields"
+
+                            <ul class="dropdown-menu p-3" style="min-width: 250px;" data-bs-auto-close="outside"
+                                (click)="$event.stopPropagation()">
+
+                                <!-- TÍTULO -->
+                                <li class="mb-2">
+                                    <label class="small fw-bold text-primary">
+                                        Clique para adicionar à fila:
+                                    </label>
+                                </li>
+
+                                <!-- CAMPOS -->
+                                <li *ngFor="let field of sortableFields"
                                     class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="small">{{ columnMap[field] || field }}</span>
+
+                                    <span class="small">
+                                        {{ columnMap[field] || field }}
+                                    </span>
+
                                     <div class="btn-group btn-group-sm">
                                         <button class="btn btn-outline-primary py-0"
-                                            (click)="addSort(field, 'asc')">ASC</button>
+                                            (click)="addSort(field, 'asc'); $event.stopPropagation()">
+                                            ASC
+                                        </button>
+
                                         <button class="btn btn-outline-primary py-0"
-                                            (click)="addSort(field, 'desc')">DESC</button>
+                                            (click)="addSort(field, 'desc'); $event.stopPropagation()">
+                                            DESC
+                                        </button>
                                     </div>
-                                </div>
-                                <hr class="dropdown-divider">
-                                <div class="small mb-2 fw-bold" *ngIf="activeSorts.length > 0">Fila atual:</div>
-                                <div *ngFor="let s of activeSorts; let i = index"
-                                    class="badge bg-light text-dark d-flex justify-content-between align-items-center mb-1 border">
-                                    <span>{{i+1}}º: {{ columnMap[s.field] || s.field }} ({{s.direction}})</span>
-                                    <i class="bi bi-x-circle text-danger ms-2" style="cursor: pointer;"
-                                        (click)="removeSort(i)"></i>
-                                </div>
-                                <button *ngIf="activeSorts.length > 0" class="btn btn-link btn-sm text-danger p-0 mt-2"
-                                    (click)="clearSorts()">Limpar Tudo</button>
-                            </div>
+
+                                </li>
+
+                                <!-- DIVISOR -->
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                <!-- FILA ATUAL -->
+                                <li *ngIf="activeSorts.length > 0" class="small mb-2 fw-bold">
+
+                                    Fila atual:
+                                </li>
+
+                                <!-- ITENS DA FILA -->
+                                <li *ngFor="let s of activeSorts; let i = index" class="mb-1">
+
+                                    <div
+                                        class="badge bg-light text-dark d-flex justify-content-between align-items-center border w-100">
+
+                                        <span>
+                                            {{i+1}}º: {{ columnMap[s.field] || s.field }} ({{s.direction}})
+                                        </span>
+
+                                        <i class="bi bi-x-circle text-danger ms-2" style="cursor: pointer;"
+                                            (click)="removeSort(i); $event.stopPropagation()">
+                                        </i>
+
+                                    </div>
+
+                                </li>
+
+                                <!-- LIMPAR -->
+                                <li *ngIf="activeSorts.length > 0">
+                                    <button class="btn btn-link btn-sm text-danger p-0 mt-2"
+                                        (click)="clearSorts(); $event.stopPropagation()">
+                                        Limpar Tudo
+                                    </button>
+                                </li>
+
+                            </ul>
                         </div>
 
                         <!-- NOVO-->
@@ -71,6 +121,7 @@
                         </button>
 
                     </div>
+
                 </div>
             </div>
         </div>
@@ -189,8 +240,8 @@
                         <th style="width: 120px;">ID</th>
                         <th>Título</th>
                         <th *ngIf="showFields.description">Descrição</th>
-                        <th *ngIf="showFields.owner">Proprietário</th>
                         <th *ngIf="showFields.status">Status</th>
+                        <th *ngIf="showFields.owner">Proprietário</th>
                         <th *ngIf="showFields.createdAt">Criado em</th>
                         <th *ngIf="showFields.updatedAt">Atualizado em</th>
                         <th *ngIf="showFields.tags">Tags</th>
@@ -199,10 +250,9 @@
                 </thead>
                 <tbody [style.opacity]="loadingService.isLoading() ? '0.5' : '1'">
                     <tr *ngFor="let doc of documents">
-                        <td><code class="badge bg-danger">{{ doc.id | shortId }}</code></td>
+                        <td> <code class="badge bg-danger" [title]="doc.id">{{ doc.id | shortId }}</code></td>
                         <td class="fw-bold">{{ doc.title }}</td>
                         <td *ngIf="showFields.description" class="small">{{ doc.description }}</td>
-                        <td *ngIf="showFields.owner">{{ doc.owner }}</td>
                         <td *ngIf="showFields.status">
                             <span class="badge" [ngClass]="{
                                 'bg-secondary': doc.status === 'DRAFT',
@@ -211,8 +261,9 @@
                                 {{ doc.status }}
                             </span>
                         </td>
-                        <td *ngIf="showFields.createdAt">{{ doc.createdAt | date:'dd/MM HH:mm' }}</td>
-                        <td *ngIf="showFields.updatedAt">{{ doc.updatedAt | date:'dd/MM HH:mm' }}</td>
+                        <td *ngIf="showFields.owner">{{ doc.owner }}</td>
+                        <td *ngIf="showFields.createdAt">{{ doc.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                        <td *ngIf="showFields.updatedAt">{{ doc.updatedAt | date:'dd/MM/yyyy HH:mm' }}</td>
                         <td *ngIf="showFields.tags">
                             <span *ngFor="let t of doc.tags" class="badge bg-info text-dark me-1 small">{{t}}</span>
                         </td>

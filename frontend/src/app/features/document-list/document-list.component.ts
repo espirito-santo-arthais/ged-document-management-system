@@ -49,14 +49,24 @@ export class DocumentListComponent implements OnInit {
 
   // Configurações de Exibição
   showFields = {
-    Title: true,
-    description: true,
+    title: true, // sempre true
+    description: false,
     status: true,
-    owner: true,
-    createdAt: true,
-    updatedAt: true,
+    owner: false,
+    createdAt: false,
+    updatedAt: false,
     tags: true
   };
+
+  columns = [
+    { key: 'title', label: 'Título', required: true },
+    { key: 'description', label: 'Descrição' },
+    { key: 'status', label: 'Status' },
+    { key: 'owner', label: 'Proprietário' },
+    { key: 'createdAt', label: 'Criado em' },
+    { key: 'updatedAt', label: 'Atualizado em' },
+    { key: 'tags', label: 'Tags' }
+  ];
 
   columnMap: { [key: string]: string } = {
     'title': 'Título',
@@ -68,7 +78,7 @@ export class DocumentListComponent implements OnInit {
   };
 
   sortableFields = Object.keys(this.columnMap);
-  activeSorts: SortOption[] = [];
+  activeSorts: SortOption[] = [{ field: 'title', direction: 'asc' }];
 
   // Filtros
   filters: DocumentSearchRequest = {
