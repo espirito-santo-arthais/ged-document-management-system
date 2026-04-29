@@ -204,12 +204,34 @@
             <div class="row g-2 mt-2">
 
                 <!-- TAGS -->
-                <div class="col-md-9 pt-2">
+                <div class="col-md-9">
+                    <!--
                     <div class="input-group input-group-sm">
                         <input class="form-control" placeholder="Adicionar tag" [(ngModel)]="tagInput"
                             (keyup.enter)="addTag()" />
                         <button class="btn btn-outline-primary" (click)="addTag()">+</button>
                     </div>
+                    -->
+
+
+                    <div class="input-group input-group-sm">
+                        <input class="form-control" placeholder="Adicionar tag" [(ngModel)]="tagInput"
+                            (keyup.enter)="addTag()" />
+
+                        <!-- BOTÂO ADD TAG -->
+                        <button class="btn btn-outline-primary" (click)="addTag()">
+                            +
+                        </button>
+
+                        <!-- BOTÃO CLEAR TAGS -->
+                        <button *ngIf="filters.tags?.length" class="btn btn-outline-danger" (click)="clearTags()"
+                            title="Limpar todas as tags">
+
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                    </div>
+
+
                     <div class="mt-2">
                         <span *ngFor="let tag of filters.tags" class="badge bg-info text-dark me-2">
                             {{ tag }} <span style="cursor:pointer;" (click)="removeTag(tag)">✖</span>
@@ -218,8 +240,9 @@
                 </div>
 
                 <!-- BOTÃO -->
-                <div class="col-md-3 d-grid">
-                    <button class="btn btn-primary" (click)="applyFilters()" [disabled]="loadingService.isLoading()">
+                <div class="col-md-3">
+                    <button class="btn btn-lg btn-primary w-100" (click)="applyFilters()"
+                        [disabled]="loadingService.isLoading()">
                         {{ loadingService.isLoading() ? 'Processando...' : 'Filtrar' }}
                     </button>
                 </div>
