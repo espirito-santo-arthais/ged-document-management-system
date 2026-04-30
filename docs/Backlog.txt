@@ -1,4 +1,7 @@
 - [BACK] Gestão de usuários e permissões;
 - [FRONT] Storage de preferências por usuário e funcionalidade no backend, cross browsers e cross maquina.
 - [FRONT] Implementar o sistema de controle de erros com I18N e outros recursos.
--  
+- [BACK] Criar endpoint para listar os documentos e suas respectivas últimas versões.
+         GET    /documents/versions/latest  - Buscar documentos com versões mais recentes (searchLatest) 
+- [FRONT] Criar lista de documentos e suas respectivas últimas versões.
+- [BACK] Arrumar os testes unitários dos serviços que foram alterados. Foram acrescidos novos métodos e algumas lógicas foram alteradas em outros métodos.
