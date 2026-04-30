@@ -197,7 +197,7 @@ export class DocumentListComponent implements OnInit {
   clearTags(): void {
     this.filters.tags = [];
   }
-  
+
   // Filtros e busca
 
   applyFilters(): void {
@@ -261,8 +261,16 @@ export class DocumentListComponent implements OnInit {
     this.router.navigate(['/documents/new']);
   }
 
-  viewDocument(event: Event, documentId: string): void {
-    this.router.navigate(['/documents', documentId]);
+  viewDocument(event: MouseEvent, documentId: string): void {
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(['/documents', documentId])
+    );
+
+    if (event.ctrlKey || event.metaKey) {
+      window.open(url, '_blank');
+    } else {
+      this.router.navigate(['/documents', documentId]);
+    }
   }
 
   updateDocument(event: Event, documentId: string): void {

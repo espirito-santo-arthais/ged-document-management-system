@@ -1,0 +1,140 @@
+<div class="container-fluid p-4">
+
+    <!-- LOADING -->
+    <div *ngIf="document === undefined" class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+        <div class="mt-2 small text-muted">Carregando...</div>
+    </div>
+
+    <!-- CONTEÚDO -->
+    <div *ngIf="document">
+
+        <!-- HEADER -->
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body d-flex justify-content-between align-items-center">
+
+                <div>
+                    <h4 class="mb-0">Documento</h4>
+                    <small class="text-muted">ID: {{ document.id }}</small>
+                </div>
+
+                <button class="btn btn-outline-primary btn-sm" (click)="downloadLatest()" [disabled]="!latestVersion">
+                    <i class="bi bi-download"></i>
+                    Baixar versão atual
+                </button>
+
+            </div>
+        </div>
+
+        <!-- METADADOS -->
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h6 class="text-info-emphasis">DADOS</h6>
+            </div>
+            <div class="card-body">
+
+                <div class="row g-3">
+                    
+                    <!-- TÍTULO -->
+                    <div class="col-md-6">
+                        <label class="small text-muted">Título</label>
+                        <div>{{ document.title }}</div>
+                    </div>
+
+                    <!-- DESCRIÇÃO -->
+                    <div class="col-md-6" *ngIf="document.description">
+                        <label class="small text-muted">Descrição</label>
+                        <div>{{ document.description }}</div>
+                    </div>
+
+                    <!-- STATUS -->
+                    <div class="col-md-6">
+                        <label class="small text-muted">Status</label>
+                        <div>
+                            <span class="badge" [ngClass]="{
+                      'bg-secondary': document.status === 'DRAFT',
+                      'bg-success': document.status === 'PUBLISHED',
+                      'bg-warning text-dark': document.status === 'ARCHIVED'
+                    }">
+                                {{ document.status }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- OWNER -->
+                    <div class="col-md-6">
+                        <label class="small text-muted">Proprietário</label>
+                        <div>{{ document.owner || '-' }}</div>
+                    </div>
+
+                    <!-- CREATED -->
+                    <div class="col-md-6">
+                        <label class="small text-muted">Criado em</label>
+                        <div>{{ document.createdAt | date:'dd/MM/yyyy HH:mm' }}</div>
+                    </div>
+
+                    <!-- UPDATED -->
+                    <div class="col-md-6">
+                        <label class="small text-muted">Atualizado em</label>
+                        <div>{{ document.updatedAt | date:'dd/MM/yyyy HH:mm' }}</div>
+                    </div>
+
+                    <!-- TAGS -->
+                    <div class="col-md-12" *ngIf="document.tags.length">
+                        <label class="small text-muted">Tags</label>
+                        <div class="mt-1">
+                            <span *ngFor="let tag of document.tags" class="badge bg-info text-dark me-2">
+                                {{ tag }}
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ÚLTIMA VERSÃO -->
+        <div class="card mt-3 shadow-sm" *ngIf="latestVersion">
+            <div class="card-header">
+                <h6 class="text-info-emphasis">VERSÃO ATUAL Nº: {{ latestVersion.version }}</h6>
+            </div>
+            <div class="card-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="small text-muted">Arquivo</label>
+                        <div>{{ latestVersion.fileName }}</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="small text-muted">Tipo</label>
+                        <div>{{ latestVersion.contentType }}</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="small text-muted">Tamanho</label>
+                        <div>{{ latestVersion.size | number }} bytes</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="small text-muted">Criado em</label>
+                        <div>{{ latestVersion.createdAt | date:'dd/MM/yyyy HH:mm' }}</div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- QUANDO NÃO TEM VERSÃO -->
+        <div class="card mt-3 shadow-sm" *ngIf="!latestVersion">
+            <div class="card-body text-muted text-center">
+                Nenhuma versão disponível para este documento.
+            </div>
+        </div>
+
+    </div>
+
+</div>

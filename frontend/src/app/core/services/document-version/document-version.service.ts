@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { DocumentVersion, DocumentVersionMetadata } from '../..//models/document.model';
+import { DocumentVersion, DocumentVersionMetadata } from '../../models/document.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,22 +12,6 @@ export class DocumentVersionService {
   private readonly apiUrl = `${environment.apiUrl}/documents`;
 
   constructor(private http: HttpClient) { }
-
-  /**
-   * Lista todas as versões de um documento.
-   */
-  getVersions(documentId: string): Observable<DocumentVersion[]> {
-    return this.http.get<DocumentVersion[]>(`${this.apiUrl}/${documentId}/versions`);
-  }
-
-  /**
-   * Busca os metadados detalhados de uma versão específica.
-   */
-  getVersionMetadata(documentId: string, version: number): Observable<DocumentVersionMetadata> {
-    return this.http.get<DocumentVersionMetadata>(
-      `${this.apiUrl}/${documentId}/versions/${version}/metadata`
-    );
-  }
 
   /**
    * Upload de nova versão utilizando FormData.
@@ -44,18 +28,54 @@ export class DocumentVersionService {
   }
 
   /**
-   * Download da versão em formato binário (Blob).
-   */
-  download(documentId: string, version: number): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/${documentId}/versions/${version}`, {
-      responseType: 'blob'
-    });
-  }
-
-  /**
    * Remove uma versão específica.
    */
   delete(documentId: string, version: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${documentId}/versions/${version}`);
+  }
+
+  /**
+   * Busca os metadados detalhados de uma versão específica.
+   */
+  getVersionMetadata(documentId: string, version: number): Observable<DocumentVersionMetadata> {
+    return this.http.get<DocumentVersionMetadata>(
+      `${this.apiUrl}/${documentId}/versions/${version}/metadata`
+    );
+  }
+
+  /**
+   * Download de uma versão específica em formato binário (Blob).
+   */
+  downloadVersion(documentId: string, version: number): Observable<HttpResponse<Blob>> {
+    return this.http.get(`${this.apiUrl}/${documentId}/versions/${version}/download`, {
+      responseType: 'blob',
+      observe: 'response'
+    });
+  }
+
+  /**
+   * Busca os metadados da versão mais recente de um documento.
+   */
+  getLatestVersionMetadata(documentId: string): Observable<DocumentVersionMetadata> {
+    return this.http.get<DocumentVersionMetadata>(
+      `${this.apiUrl}/${documentId}/versions/latest/metadata`
+    );
+  }
+
+  /**
+   * Download da versão mais recente em formato binário (Blob).
+   */
+  downloadLatestVersion(documentId: string): Observable<HttpResponse<Blob>> {
+    return this.http.get(`${this.apiUrl}/${documentId}/versions/latest/download`, {
+      responseType: 'blob',
+      observe: 'response'
+    });
+  }
+
+  /**
+   * Lista todas as versões de um documento.
+   */
+  getVersions(documentId: string): Observable<DocumentVersion[]> {
+    return this.http.get<DocumentVersion[]>(`${this.apiUrl}/${documentId}/versions`);
   }
 }
