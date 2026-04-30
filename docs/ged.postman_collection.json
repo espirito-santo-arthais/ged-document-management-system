@@ -119,7 +119,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/documents/02bf0955-0f08-4178-a555-276a8d78686c",
+              "raw": "http://localhost:8080/documents/d23b0f3a-8fee-4d26-92be-072e2a5f36f0",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -127,7 +127,7 @@
               "port": "8080",
               "path": [
                 "documents",
-                "02bf0955-0f08-4178-a555-276a8d78686c"
+                "d23b0f3a-8fee-4d26-92be-072e2a5f36f0"
               ]
             }
           },
@@ -453,13 +453,13 @@
                 {
                   "key": "file",
                   "type": "file",
-                  "uuid": "ea8b0870-c734-46ee-bc19-42e79b930ae4",
-                  "src": "/C:/Users/espir/OneDrive/Documentos/Apresentação_Fit_Bank - Produtos.pdf"
+                  "uuid": "7fc19e60-0f2d-49bc-832a-32d63e273e29",
+                  "src": "/C:/Users/espir/OneDrive/Documentos/Arthais Systems - Portifólio de Serviços.pdf"
                 }
               ]
             },
             "url": {
-              "raw": "http://localhost:8080/documents/d23b0f3a-8fee-4d26-92be-072e2a5f36f0/versions",
+              "raw": "http://localhost:8080/documents/9a32a2d0-254f-4428-ac9c-d723bc082271/versions",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -467,10 +467,136 @@
               "port": "8080",
               "path": [
                 "documents",
-                "d23b0f3a-8fee-4d26-92be-072e2a5f36f0",
+                "9a32a2d0-254f-4428-ac9c-d723bc082271",
                 "versions"
               ]
             }
+          },
+          "response": []
+        },
+        {
+          "name": "exclusão de versão",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/documents/f662db0b-6f13-455f-9cd6-bb38ecc909b8/versions/5",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "documents",
+                "f662db0b-6f13-455f-9cd6-bb38ecc909b8",
+                "versions",
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "consultar versão",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/documents/f662db0b-6f13-455f-9cd6-bb38ecc909b8/versions/4/metadata",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "documents",
+                "f662db0b-6f13-455f-9cd6-bb38ecc909b8",
+                "versions",
+                "4",
+                "metadata"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "download de versão",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/documents/f662db0b-6f13-455f-9cd6-bb38ecc909b8/versions/4/download",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "documents",
+                "f662db0b-6f13-455f-9cd6-bb38ecc909b8",
+                "versions",
+                "4",
+                "download"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "consultar versão mais recente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer SEU_TOKEN"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/documents/f662db0b-6f13-455f-9cd6-bb38ecc909b8/versions/latest/metadata",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "documents",
+                "f662db0b-6f13-455f-9cd6-bb38ecc909b8",
+                "versions",
+                "latest",
+                "metadata"
+              ]
+            },
+            "description": "Generated from cURL: curl --location 'http://localhost:8080/documents/SEU_DOCUMENT_ID/versions/latest/metadata' \\\r\n--header 'Authorization: Bearer SEU_TOKEN'"
+          },
+          "response": []
+        },
+        {
+          "name": "download de versão mais recente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer SEU_TOKEN"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/documents/f662db0b-6f13-455f-9cd6-bb38ecc909b8/versions/latest/download",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "documents",
+                "f662db0b-6f13-455f-9cd6-bb38ecc909b8",
+                "versions",
+                "latest",
+                "download"
+              ]
+            },
+            "description": "Generated from cURL: curl --location 'http://localhost:8080/documents/SEU_DOCUMENT_ID/versions/latest/metadata' \\\r\n--header 'Authorization: Bearer SEU_TOKEN'"
           },
           "response": []
         },
@@ -490,73 +616,6 @@
                 "documents",
                 "d23b0f3a-8fee-4d26-92be-072e2a5f36f0",
                 "versions"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "consultar versão",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8080/documents/d23b0f3a-8fee-4d26-92be-072e2a5f36f0/versions/4/metadata",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "documents",
-                "d23b0f3a-8fee-4d26-92be-072e2a5f36f0",
-                "versions",
-                "4",
-                "metadata"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "download de versão",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8080/documents/d23b0f3a-8fee-4d26-92be-072e2a5f36f0/versions/5",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "documents",
-                "d23b0f3a-8fee-4d26-92be-072e2a5f36f0",
-                "versions",
-                "5"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "exclusão de versão",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8080/documents/d23b0f3a-8fee-4d26-92be-072e2a5f36f0/versions/5",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8080",
-              "path": [
-                "documents",
-                "d23b0f3a-8fee-4d26-92be-072e2a5f36f0",
-                "versions",
-                "5"
               ]
             }
           },
@@ -595,7 +654,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"admin123\"\r\n}",
+              "raw": "{\r\n  \"username\": \"admin@ged.com.br\",\r\n  \"password\": \"admin123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"

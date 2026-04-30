@@ -1,6 +1,5 @@
 package com.ged.backend.controller;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,22 +38,17 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Document Versions", description = "Gerenciamento de versões de documentos (upload, download e consulta)")
 public class DocumentVersionController {
 
-	private final DocumentVersionService service;
+	private final DocumentVersionService documentVersionService;
 
 	// =========================
-	// UPLOAD
+	// UPLOAD VERSION
 	// =========================
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	@Operation(
-			summary = "Upload de nova versão",
-			description = "Realiza o upload de um arquivo (PDF, PNG ou JPG) criando uma nova versão para o documento.")
+	@Operation(summary = "Subir nova versão", description = "Realiza o upload de um arquivo (PDF, PNG ou JPG) criando uma nova versão para o documento.")
 	@ApiResponses(
 			value = {
-					@ApiResponse(
-							responseCode = "200",
-							description = "Upload realizado com sucesso",
-							content = @Content(schema = @Schema(implementation = DocumentVersionResponseDTO.class))),
+					@ApiResponse(responseCode = "200", description = "Upload realizado com sucesso", content = @Content(schema = @Schema(implementation = DocumentVersionResponseDTO.class))),
 					@ApiResponse(responseCode = "400", description = "Arquivo inválido"),
 					@ApiResponse(responseCode = "404", description = "Documento não encontrado")
 			})
@@ -63,7 +57,7 @@ public class DocumentVersionController {
 			@PathVariable UUID documentId,
 			@Parameter(description = "Arquivo a ser enviado (PDF, PNG, JPG)", required = true)
 			@RequestParam("file") MultipartFile file) {
-		return ResponseEntity.ok(service.upload(documentId, file));
+		return ResponseEntity.ok(documentVersionService.upload(documentId, file));
 	}
 
 	// =========================
@@ -71,9 +65,7 @@ public class DocumentVersionController {
 	// =========================
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	@DeleteMapping("/{version}")
-	@Operation(
-			summary = "Excluir versão",
-			description = "Remove uma versão específica do documento. Não permite excluir a versão mais recente.")
+	@Operation(summary = "Excluir versão", description = "Remove uma versão específica do documento permanentemente (metadados e arquivo). Não permite excluir a versão mais recente.")
 	@ApiResponses(
 			value = {
 					@ApiResponse(responseCode = "204", description = "Versão removida com sucesso"),
@@ -85,7 +77,7 @@ public class DocumentVersionController {
 			@PathVariable UUID documentId,
 			@Parameter(description = "Número da versão", example = "1")
 			@PathVariable Integer version) {
-		service.deleteVersion(documentId, version);
+		documentVersionService.deleteVersion(documentId, version);
 
 		return ResponseEntity.noContent().build();
 	}
@@ -95,9 +87,7 @@ public class DocumentVersionController {
 	// =========================
 	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 	@GetMapping("/{version}/metadata")
-	@Operation(
-			summary = "Consultar metadados da versão",
-			description = "Retorna os metadados de uma versão específica do documento.")
+	@Operation(summary = "Buscar metadados de versão", description = "Retorna os metadados de uma versão específica do documento.")
 	@ApiResponses(
 			value = {
 					@ApiResponse(responseCode = "200", description = "Consulta realizada com sucesso"),
@@ -108,17 +98,15 @@ public class DocumentVersionController {
 			@PathVariable UUID documentId,
 			@Parameter(description = "Número da versão", example = "1")
 			@PathVariable Integer version) {
-		return ResponseEntity.ok(service.findVersion(documentId, version));
+		return ResponseEntity.ok(documentVersionService.findVersion(documentId, version));
 	}
 
 	// =========================
-	// DOWNLOAD
+	// GET VERSION DOWNLOAD
 	// =========================
 	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-	@GetMapping("/{version}")
-	@Operation(
-			summary = "Download da versão",
-			description = "Realiza o download do arquivo de uma versão específica do documento.")
+	@GetMapping("/{version}/download")
+	@Operation(summary = "Baixar versão", description = "Realiza o download do arquivo de uma versão específica do documento.")
 	@ApiResponses(
 			value = {
 					@ApiResponse(responseCode = "200", description = "Download realizado com sucesso"),
@@ -130,38 +118,98 @@ public class DocumentVersionController {
 			@Parameter(description = "Número da versão", example = "1")
 			@PathVariable Integer version) {
 
-		log.info("Download versão. DocumentId: {}, Version: {}", documentId, version);
+		log.info("Iniciando download de versão. DocumentId: {}, Version: {}", documentId, version);
 
-		try (InputStream inputStream = service.download(documentId, version)) {
+		try {
+			var result = documentVersionService.downloadWithMetadata(documentId, version);
 
-			// BUSCA METADATA (sem quebrar padrão)
-			var metadata = service.findVersion(documentId, version);
+			try (var inputStream = result.getInputStream()) {
 
-			byte[] fileBytes = inputStream.readAllBytes();
+				byte[] fileBytes = inputStream.readAllBytes();
 
-			return ResponseEntity.ok()
-					.header(HttpHeaders.CONTENT_DISPOSITION,
-							"attachment; filename=\"" + metadata.getFileName() + "\"")
-					.contentType(MediaType.parseMediaType(metadata.getContentType()))
-					.contentLength(fileBytes.length)
-					.body(fileBytes);
+				log.info("Download realizado com sucesso. DocumentId: {}, Version: {}", documentId, version);
 
+				return ResponseEntity.ok()
+						.header(HttpHeaders.CONTENT_DISPOSITION,
+								"attachment; filename=\"" + result.getMetadata().getFileName() + "\"")
+						.contentType(MediaType.parseMediaType(result.getMetadata().getContentType()))
+						.contentLength(fileBytes.length)
+						.body(fileBytes);
+			}
 		} catch (BaseException ex) {
 			throw ex;
 		} catch (Exception ex) {
-			log.error("Erro ao processar download", ex);
-			throw new UnexpectedException("Erro ao processar download", ex);
+			String errorMessage = String.format("Erro inesperado ao realizar download de versão. DocumentId: %s, Version: %s", documentId, version);
+			log.error(errorMessage, ex);
+			throw new UnexpectedException(errorMessage, ex);
 		}
 	}
 
-	// =========================
-	// LIST VERSIONS
-	// =========================
+	// ===========================
+	// GET LATEST VERSION METADATA
+	// ===========================
+	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+	@GetMapping("/latest/metadata")
+	@Operation(summary = "Buscar metadados de versão mais recente", description = "Retorna os metadados da versão mais recente de um documento.")
+	@ApiResponses(
+			value = {
+					@ApiResponse(responseCode = "200", description = "Consulta realizada com sucesso"),
+					@ApiResponse(responseCode = "404", description = "Nenhuma versão encontrada")
+			})
+	public ResponseEntity<DocumentVersionResponseDTO> getLatestVersion(
+			@Parameter(description = "ID do documento", required = true)
+			@PathVariable UUID documentId) {
+		return ResponseEntity.ok(documentVersionService.findLatestVersion(documentId));
+	}
+
+	// ===========================
+	// GET LATEST VERSION DOWNLOAD
+	// ===========================
+	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+	@GetMapping("/latest/download")
+	@Operation(summary = "Baixar versão mais recente", description = "Realiza o download do arquivo da versão mais recente do documento.")
+	@ApiResponses(
+			value = {
+					@ApiResponse(responseCode = "200", description = "Download realizado com sucesso"),
+					@ApiResponse(responseCode = "404", description = "Documento ou versão não encontrada")
+			})
+	public ResponseEntity<byte[]> downloadLatest(
+			@Parameter(description = "ID do documento", required = true)
+			@PathVariable UUID documentId) {
+
+		log.info("Iniciando download da versão mais recente. DocumentId: {}", documentId);
+
+		try {
+			var result = documentVersionService.downloadLatestWithMetadata(documentId);
+
+			try (var inputStream = result.getInputStream()) {
+
+				byte[] fileBytes = inputStream.readAllBytes();
+
+				log.info("Download da versão mais recente realizado com sucesso. DocumentId: {}", documentId);
+
+				return ResponseEntity.ok()
+						.header(HttpHeaders.CONTENT_DISPOSITION,
+								"attachment; filename=\"" + result.getMetadata().getFileName() + "\"")
+						.contentType(MediaType.parseMediaType(result.getMetadata().getContentType()))
+						.contentLength(fileBytes.length)
+						.body(fileBytes);
+			}
+		} catch (BaseException ex) {
+			throw ex;
+		} catch (Exception ex) {
+			String errorMessage = String.format("Erro inesperado ao realizar download da versão mais recente. DocumentId: %s", documentId);
+			log.error(errorMessage, ex);
+			throw new UnexpectedException(errorMessage, ex);
+		}
+	}
+
+	// ==========================
+	// LIST ALL VERSIONS METADATA
+	// ==========================
 	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 	@GetMapping
-	@Operation(
-			summary = "Listar versões",
-			description = "Lista todas as versões de um documento.")
+	@Operation(summary = "Listar versões", description = "Lista todas as versões de um documento.")
 	@ApiResponses(
 			value = {
 					@ApiResponse(responseCode = "200", description = "Listagem realizada com sucesso"),
@@ -170,6 +218,6 @@ public class DocumentVersionController {
 	public ResponseEntity<List<DocumentVersionResponseDTO>> listVersions(
 			@Parameter(description = "ID do documento", required = true)
 			@PathVariable UUID documentId) {
-		return ResponseEntity.ok(service.listVersions(documentId));
+		return ResponseEntity.ok(documentVersionService.listVersions(documentId));
 	}
 }
