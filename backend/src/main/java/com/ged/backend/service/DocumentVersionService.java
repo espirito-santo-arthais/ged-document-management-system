@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ged.backend.domain.dto.documentversion.DocumentVersionResponseDTO;
 import com.ged.backend.domain.entity.Document;
 import com.ged.backend.domain.entity.DocumentVersion;
+import com.ged.backend.domain.result.documentversion.DocumentVersionDownloadResult;
 import com.ged.backend.exception.BadRequestException;
 import com.ged.backend.exception.BaseException;
 import com.ged.backend.exception.DatabaseException;
@@ -108,9 +109,7 @@ public class DocumentVersionService {
 			} catch (BaseException ex) {
 				throw ex;
 			} catch (DataAccessException ex) {
-				String errorMessage = String.format(
-						"Erro de banco de dados ao preparar upload. DocumentId: %s",
-						documentId);
+				String errorMessage = String.format("Erro de banco de dados ao preparar upload. DocumentId: %s", documentId);
 				log.error(errorMessage, ex);
 				throw new DatabaseException(errorMessage, ex);
 			}
@@ -122,9 +121,7 @@ public class DocumentVersionService {
 			try {
 				storageKey = storageService.upload(file);
 			} catch (Exception ex) {
-				String errorMessage = String.format(
-						"Erro ao realizar upload no storage. DocumentId: %s, File: %s",
-						documentId, file.getOriginalFilename());
+				String errorMessage = String.format("Erro ao realizar upload no storage. DocumentId: %s, File: %s", documentId, file.getOriginalFilename());
 				log.error(errorMessage, ex);
 				throw new StorageException(errorMessage, ex);
 			}
@@ -146,11 +143,9 @@ public class DocumentVersionService {
 
 				DocumentVersionResponseDTO response = DocumentVersionMapper.toResponse(saved);
 
-				log.info("Upload realizado com sucesso. DocumentId: {}, Versão: {}, Key: {}",
-						documentId, nextVersion, storageKey);
+				log.info("Upload realizado com sucesso. DocumentId: {}, Versão: {}, Key: {}", documentId, nextVersion, storageKey);
 
 				return response;
-
 			} catch (DataAccessException ex) {
 				// rollback manual do storage (MUITO IMPORTANTE)
 				try {
@@ -159,13 +154,10 @@ public class DocumentVersionService {
 				} catch (Exception rollbackEx) {
 					log.error("Erro ao realizar rollback do storage. Key: {}", storageKey, rollbackEx);
 					// Não conseguiu limpar o storage, o pessoal de HelpDesk vai ter que localizar
-					// os logs,
-					// obter o storageKey e excluir manualmente o arquivo do storage.
+					// os logs, obter o storageKey e excluir manualmente o arquivo do storage.
 				}
 
-				String errorMessage = String.format(
-						"Erro de banco de dados ao salvar versão após upload. DocumentId: %s",
-						documentId);
+				String errorMessage = String.format("Erro de banco de dados ao salvar versão após upload. DocumentId: %s", documentId);
 				log.error(errorMessage, ex);
 				throw new DatabaseException(errorMessage, ex);
 			}
@@ -209,15 +201,12 @@ public class DocumentVersionService {
 				entity = documentVersionRepository
 						.findByDocumentIdAndVersion(documentId, version)
 						.orElseThrow(() -> {
-							String msg = String.format(
-									"Versão não encontrada. DocumentId: %s, Version: %s",
-									documentId, version);
+							String msg = String.format("Versão não encontrada. DocumentId: %s, Version: %s", documentId, version);
 							log.error(msg);
 							return new ResourceNotFoundException(msg);
 						});
 
-				allVersions = documentVersionRepository
-						.findByDocumentIdOrderByVersionDesc(documentId);
+				allVersions = documentVersionRepository.findByDocumentIdOrderByVersionDesc(documentId);
 
 				if (allVersions.size() <= 1) {
 					String msg = "Não é permitido excluir a única versão do documento";
@@ -235,9 +224,7 @@ public class DocumentVersionService {
 			} catch (BaseException ex) {
 				throw ex;
 			} catch (DataAccessException ex) {
-				String errorMessage = String.format(
-						"Erro de banco de dados ao preparar exclusão de versão. DocumentId: %s, Version: %s",
-						documentId, version);
+				String errorMessage = String.format("Erro de banco de dados ao preparar exclusão de versão. DocumentId: %s, Version: %s", documentId, version);
 				log.error(errorMessage, ex);
 				throw new DatabaseException(errorMessage, ex);
 			}
@@ -248,9 +235,7 @@ public class DocumentVersionService {
 			try {
 				storageService.delete(entity.getStorageKey());
 			} catch (Exception ex) {
-				String errorMessage = String.format(
-						"Erro ao excluir arquivo no storage. DocumentId: %s, Version: %s, Key: %s",
-						documentId, version, entity.getStorageKey());
+				String errorMessage = String.format("Erro ao excluir arquivo no storage. DocumentId: %s, Version: %s, Key: %s", documentId, version, entity.getStorageKey());
 				log.error(errorMessage, ex);
 				throw new StorageException(errorMessage, ex);
 			}
@@ -261,16 +246,12 @@ public class DocumentVersionService {
 			try {
 				documentVersionRepository.delete(entity);
 
-				log.info("Versão excluída com sucesso. DocumentId: {}, Version: {}",
-						documentId, version);
+				log.info("Versão excluída com sucesso. DocumentId: {}, Version: {}", documentId, version);
 			} catch (DataAccessException ex) {
 				// aqui não tem rollback real possível
-				log.error("Inconsistência detectada: arquivo removido, mas falha ao remover do banco. DocumentId: {}, Version: {}",
-						documentId, version, ex);
+				log.error("Inconsistência detectada: arquivo removido, mas falha ao remover do banco. DocumentId: {}, Version: {}", documentId, version, ex);
 
-				String errorMessage = String.format(
-						"Erro de banco de dados ao excluir versão após remoção no storage. DocumentId: %s, Version: %s",
-						documentId, version);
+				String errorMessage = String.format("Erro de banco de dados ao excluir versão após remoção no storage. DocumentId: %s, Version: %s", documentId, version);
 
 				throw new DatabaseException(errorMessage, ex);
 			}
@@ -306,17 +287,14 @@ public class DocumentVersionService {
 			DocumentVersion entity = documentVersionRepository
 					.findByDocumentIdAndVersion(documentId, version)
 					.orElseThrow(() -> {
-						String msg = String.format(
-								"Versão não encontrada. DocumentId: %s, Version: %s",
-								documentId, version);
+						String msg = String.format("Versão não encontrada. DocumentId: %s, Version: %s", documentId, version);
 						log.error(msg);
 						return new ResourceNotFoundException(msg);
 					});
 
 			DocumentVersionResponseDTO response = DocumentVersionMapper.toResponse(entity);
 
-			log.info("Versão encontrada com sucesso. DocumentId: {}, Version: {}",
-					documentId, version);
+			log.info("Versão encontrada com sucesso. DocumentId: {}, Version: {}", documentId, version);
 
 			return response;
 		} catch (BaseException ex) {
@@ -327,6 +305,42 @@ public class DocumentVersionService {
 			throw new DatabaseException(errorMessage, ex);
 		} catch (Exception ex) {
 			String errorMessage = String.format("Erro inesperado ao buscar de versão de arquivo. DocumentId: %s, Version: %s", documentId, version);
+			log.error(errorMessage, ex);
+			throw new UnexpectedException(errorMessage, ex);
+		}
+	}
+
+	public DocumentVersionResponseDTO findLatestVersion(UUID documentId) {
+		log.info("Buscando versão mais recente. DocumentId: {}", documentId);
+
+		if (documentId == null) {
+			String msg = "ID do documento é obrigatório para consulta da versão mais recente";
+			log.error(msg);
+			throw new BadRequestException(msg);
+		}
+
+		try {
+			DocumentVersion entity = documentVersionRepository
+					.findTopByDocumentIdOrderByVersionDesc(documentId)
+					.orElseThrow(() -> {
+						String msg = String.format("Nenhuma versão encontrada para o documento. DocumentId: %s", documentId);
+						log.error(msg);
+						return new ResourceNotFoundException(msg);
+					});
+
+			DocumentVersionResponseDTO response = DocumentVersionMapper.toResponse(entity);
+
+			log.info("Versão mais recente encontrada com sucesso. DocumentId: {}, Version: {}", documentId, entity.getVersion());
+
+			return response;
+		} catch (BaseException ex) {
+			throw ex; // mantém regra de negócio
+		} catch (DataAccessException ex) {
+			String errorMessage = String.format("Erro de banco de dados ao buscar versão mais recente. DocumentId: %s", documentId);
+			log.error(errorMessage, ex);
+			throw new DatabaseException(errorMessage, ex);
+		} catch (Exception ex) {
+			String errorMessage = String.format("Erro inesperado ao buscar versão mais recente. DocumentId: %s", documentId);
 			log.error(errorMessage, ex);
 			throw new UnexpectedException(errorMessage, ex);
 		}
@@ -357,16 +371,12 @@ public class DocumentVersionService {
 				entity = documentVersionRepository
 						.findByDocumentIdAndVersion(documentId, version)
 						.orElseThrow(() -> {
-							String msg = String.format(
-									"Versão não encontrada. DocumentId: %s, Version: %s",
-									documentId, version);
+							String msg = String.format("Versão não encontrada. DocumentId: %s, Version: %s", documentId, version);
 							log.error(msg);
 							return new ResourceNotFoundException(msg);
 						});
 			} catch (DataAccessException ex) {
-				String errorMessage = String.format(
-						"Erro de banco de dados ao buscar versão para download. DocumentId: %s, Version: %s",
-						documentId, version);
+				String errorMessage = String.format("Erro de banco de dados ao buscar versão para download. DocumentId: %s, Version: %s", documentId, version);
 				log.error(errorMessage, ex);
 				throw new DatabaseException(errorMessage, ex);
 			}
@@ -377,14 +387,11 @@ public class DocumentVersionService {
 			try {
 				InputStream stream = storageService.download(entity.getStorageKey());
 
-				log.info("Download realizado com sucesso. DocumentId: {}, Version: {}",
-						documentId, version);
+				log.info("Download realizado com sucesso. DocumentId: {}, Version: {}", documentId, version);
 
 				return stream;
 			} catch (Exception ex) {
-				String errorMessage = String.format(
-						"Erro ao realizar download no storage. DocumentId: %s, Version: %s, Key: %s",
-						documentId, version, entity.getStorageKey());
+				String errorMessage = String.format("Erro ao realizar download no storage. DocumentId: %s, Version: %s, Key: %s", documentId, version, entity.getStorageKey());
 				log.error(errorMessage, ex);
 				throw new StorageException(errorMessage, ex);
 			}
@@ -396,6 +403,179 @@ public class DocumentVersionService {
 			throw new DatabaseException(errorMessage, ex);
 		} catch (Exception ex) {
 			String errorMessage = String.format("Erro inesperado ao realizar download de versão de arquivo. DocumentId: %s, Version: %s", documentId, version);
+			log.error(errorMessage, ex);
+			throw new UnexpectedException(errorMessage, ex);
+		}
+	}
+
+	public DocumentVersionDownloadResult downloadWithMetadata(UUID documentId, Integer version) {
+		log.info("Iniciando download com metadata. DocumentId: {}, Version: {}", documentId, version);
+
+		if (documentId == null) {
+			String msg = "ID do documento é obrigatório para download";
+			log.error(msg);
+			throw new BadRequestException(msg);
+		}
+
+		if (version == null) {
+			String msg = "Versão é obrigatória para download";
+			log.error(msg);
+			throw new BadRequestException(msg);
+		}
+
+		try {
+			DocumentVersion entity;
+
+			try {
+				entity = documentVersionRepository
+						.findByDocumentIdAndVersion(documentId, version)
+						.orElseThrow(() -> {
+							String msg = String.format("Versão não encontrada. DocumentId: %s, Version: %s", documentId, version);
+							log.error(msg);
+							return new ResourceNotFoundException(msg);
+						});
+			} catch (DataAccessException ex) {
+				String errorMessage = String.format("Erro de banco de dados ao buscar versão para download. DocumentId: %s, Version: %s", documentId, version);
+				log.error(errorMessage, ex);
+				throw new DatabaseException(errorMessage, ex);
+			}
+
+			DocumentVersionResponseDTO metadata = DocumentVersionMapper.toResponse(entity);
+
+			try {
+				InputStream stream = storageService.download(entity.getStorageKey());
+
+				log.info("Download com metadata realizado com sucesso. DocumentId: {}, Version: {}", documentId, version);
+
+				return DocumentVersionDownloadResult.builder()
+						.inputStream(stream)
+						.metadata(metadata)
+						.build();
+			} catch (Exception ex) {
+				String errorMessage = String.format("Erro ao realizar download no storage. DocumentId: %s, Version: %s, Key: %s", documentId, version, entity.getStorageKey());
+				log.error(errorMessage, ex);
+				throw new StorageException(errorMessage, ex);
+			}
+		} catch (BaseException ex) {
+			throw ex; // mantém regra de negócio
+		} catch (DataAccessException ex) {
+			String errorMessage = String.format("Erro de banco de dados ao realizar download de versão. DocumentId: %s, Version: %s", documentId, version);
+			log.error(errorMessage, ex);
+			throw new DatabaseException(errorMessage, ex);
+		} catch (Exception ex) {
+			String errorMessage = String.format("Erro inesperado ao realizar download de versão. DocumentId: %s, Version: %s", documentId, version);
+			log.error(errorMessage, ex);
+			throw new UnexpectedException(errorMessage, ex);
+		}
+	}
+
+	public InputStream downloadLatest(UUID documentId) {
+		log.info("Iniciando download da versão mais recente. DocumentId: {}", documentId);
+
+		if (documentId == null) {
+			String msg = "ID do documento é obrigatório para download da versão mais recente";
+			log.error(msg);
+			throw new BadRequestException(msg);
+		}
+
+		try {
+			// =========================
+			// 1. BUSCA NO BANCO
+			// =========================
+			DocumentVersion entity;
+
+			try {
+				entity = documentVersionRepository
+						.findTopByDocumentIdOrderByVersionDesc(documentId)
+						.orElseThrow(() -> {
+							String msg = String.format("Nenhuma versão encontrada para o documento. DocumentId: %s", documentId);
+							log.error(msg);
+							return new ResourceNotFoundException(msg);
+						});
+			} catch (DataAccessException ex) {
+				String errorMessage = String.format("Erro de banco de dados ao buscar versão mais recente para download. DocumentId: %s", documentId);
+				log.error(errorMessage, ex);
+				throw new DatabaseException(errorMessage, ex);
+			}
+
+			// =========================
+			// 2. DOWNLOAD STORAGE
+			// =========================
+			try {
+				InputStream stream = storageService.download(entity.getStorageKey());
+
+				log.info("Download da versão mais recente realizado com sucesso. DocumentId: {}, Version: {}", documentId, entity.getVersion());
+
+				return stream;
+			} catch (Exception ex) {
+				String errorMessage = String.format("Erro ao realizar download no storage da versão mais recente. DocumentId: %s, Version: %s, Key: %s", documentId, entity.getVersion(), entity.getStorageKey());
+				log.error(errorMessage, ex);
+				throw new StorageException(errorMessage, ex);
+			}
+		} catch (BaseException ex) {
+			throw ex; // mantém regra de negócio
+		} catch (DataAccessException ex) {
+			String errorMessage = String.format("Erro de banco de dados ao realizar download da versão mais recente. DocumentId: %s", documentId);
+			log.error(errorMessage, ex);
+			throw new DatabaseException(errorMessage, ex);
+		} catch (Exception ex) {
+			String errorMessage = String.format("Erro inesperado ao realizar download da versão mais recente. DocumentId: %s", documentId);
+			log.error(errorMessage, ex);
+			throw new UnexpectedException(errorMessage, ex);
+		}
+	}
+
+	public DocumentVersionDownloadResult downloadLatestWithMetadata(UUID documentId) {
+		log.info("Iniciando download da versão mais recente com metadata. DocumentId: {}", documentId);
+
+		if (documentId == null) {
+			String msg = "ID do documento é obrigatório para download";
+			log.error(msg);
+			throw new BadRequestException(msg);
+		}
+
+		try {
+			DocumentVersion entity;
+
+			try {
+				entity = documentVersionRepository
+						.findTopByDocumentIdOrderByVersionDesc(documentId)
+						.orElseThrow(() -> {
+							String msg = String.format("Nenhuma versão encontrada para o documento. DocumentId: %s", documentId);
+							log.error(msg);
+							return new ResourceNotFoundException(msg);
+						});
+			} catch (DataAccessException ex) {
+				String errorMessage = String.format("Erro de banco de dados ao buscar versão mais recente. DocumentId: %s", documentId);
+				log.error(errorMessage, ex);
+				throw new DatabaseException(errorMessage, ex);
+			}
+
+			DocumentVersionResponseDTO metadata = DocumentVersionMapper.toResponse(entity);
+
+			try {
+				InputStream stream = storageService.download(entity.getStorageKey());
+
+				log.info("Download da versão mais recente realizado com sucesso. DocumentId: {}", documentId);
+
+				return DocumentVersionDownloadResult.builder()
+						.inputStream(stream)
+						.metadata(metadata)
+						.build();
+
+			} catch (Exception ex) {
+				String errorMessage = String.format("Erro ao realizar download no storage da versão mais recente. DocumentId: %s, Key: %s", documentId, entity.getStorageKey());
+				log.error(errorMessage, ex);
+				throw new StorageException(errorMessage, ex);
+			}
+		} catch (BaseException ex) {
+			throw ex; // mantém regra de negócio
+		} catch (DataAccessException ex) {
+			String errorMessage = String.format("Erro de banco de dados ao realizar download da versão mais recente. DocumentId: %s", documentId);
+			log.error(errorMessage, ex);
+			throw new DatabaseException(errorMessage, ex);
+		} catch (Exception ex) {
+			String errorMessage = String.format("Erro inesperado ao realizar download da versão mais recente. DocumentId: %s", documentId);
 			log.error(errorMessage, ex);
 			throw new UnexpectedException(errorMessage, ex);
 		}
@@ -417,8 +597,7 @@ public class DocumentVersionService {
 					.map(DocumentVersionMapper::toResponse)
 					.toList();
 
-			log.info("Versões listadas com sucesso. DocumentId: {}, Total: {}",
-					documentId, response.size());
+			log.info("Versões listadas com sucesso. DocumentId: {}, Total: {}", documentId, response.size());
 
 			return response;
 		} catch (BaseException ex) {

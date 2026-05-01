@@ -19,13 +19,26 @@ export class DocumentService {
   /**
    * Remove um documento permanentemente.
    * O Token, o Spinner e o Erro são tratados automaticamente pela infraestrutura.
-   */
+   * @param id Identificador único do documento.
+  */
   delete(id: string): Observable<void> {
     return this.httpClient.delete<void>(`${this.apiUrl}/${id}`);
   }
 
   /**
+   * Busca um documento pelo seu ID.
+   * Retorna os metadados completos do documento.
+   * O Token, o Spinner e o Erro são tratados automaticamente pela infraestrutura.
+   * @param id Identificador único do documento.
+   */
+  findById(id: string): Observable<Document> {
+    return this.httpClient.get<Document>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
    * Realiza a busca paginada de documentos com suporte a ordenação múltipla.
+   * Retorna os metadados completos dos documentos contidos na página retornada.
+   * O Token, o Spinner e o Erro são tratados automaticamente pela infraestrutura.
    * @param filters Critérios de busca.
    * @param page Índice da página (zero-based).
    * @param size Quantidade de itens por página.

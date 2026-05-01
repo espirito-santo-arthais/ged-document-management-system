@@ -21,7 +21,7 @@ public class AuthRequestDTO {
 
 	@Schema(
 			description = "Nome de usuário",
-			example = "admin",
+			example = "admin@ged.com.br",
 			requiredMode = Schema.RequiredMode.REQUIRED,
 			maxLength = 100)
 	@NotBlank(message = "O usuário é obrigatório")

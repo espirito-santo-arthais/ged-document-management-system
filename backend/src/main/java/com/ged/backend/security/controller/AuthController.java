@@ -26,7 +26,7 @@ public class AuthController {
 	private final AuthService service;
 
 	@Operation(
-			summary = "Autenticação de usuário",
+			summary = "Autenticar usuário",
 			description = "Realiza autenticação e retorna um token JWT válido")
 	@ApiResponses(
 			value = {

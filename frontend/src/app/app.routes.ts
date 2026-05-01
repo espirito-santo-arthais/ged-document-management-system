@@ -36,5 +36,13 @@ export const routes: Routes = [
         loadComponent: () =>
             import('./features/document-list/document-list.component')
                 .then(m => m.DocumentListComponent)
+    },
+    {
+        path: 'documents/:id',
+        canActivate: [authGuard],
+        data: { showFooter: false },
+        loadComponent: () =>
+            import('./features/document-view/document-view.component')
+                .then(m => m.DocumentViewComponent)
     }
 ];
