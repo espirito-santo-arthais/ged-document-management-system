@@ -1,13 +1,13 @@
 <div class="container-fluid p-4">
 
     <!-- LOADING -->
-    <div *ngIf="document === undefined" class="text-center py-5">
+    <div *ngIf="loading" class="text-center py-5">
         <div class="spinner-border text-primary"></div>
         <div class="mt-2 small text-muted">Carregando...</div>
     </div>
 
     <!-- CONTEÚDO -->
-    <div *ngIf="document">
+    <div *ngIf="!loading && document">
 
         <!-- HEADER -->
         <div class="card mb-3 shadow-sm">
@@ -34,7 +34,7 @@
             <div class="card-body">
 
                 <div class="row g-3">
-                    
+
                     <!-- TÍTULO -->
                     <div class="col-md-6">
                         <label class="small text-muted">Título</label>
