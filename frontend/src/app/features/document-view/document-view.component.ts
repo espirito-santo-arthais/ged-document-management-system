@@ -2,11 +2,13 @@ import { Component, OnInit, inject, ChangeDetectorRef } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ActivatedRoute } from "@angular/router";
 
+import { of } from "rxjs";
+import { switchMap, catchError } from "rxjs/operators";
+
 import { DocumentService } from "../../core/services/document/document.service";
 import { DocumentVersionService } from "../../core/services/document-version/document-version.service";
 
-import { Document } from "../../core/models/document.model";
-import { DocumentVersionMetadata } from "../../core/models/document.model";
+import { Document, DocumentVersionMetadata } from "../../core/models/document.model";
 
 @Component({
   selector: "app-document-view",
@@ -16,11 +18,14 @@ import { DocumentVersionMetadata } from "../../core/models/document.model";
   styleUrls: ["./document-view.component.css"],
 })
 export class DocumentViewComponent implements OnInit {
+
+  // Injeções
+  private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
   private documentService = inject(DocumentService);
   private versionService = inject(DocumentVersionService);
-  private cdr = inject(ChangeDetectorRef);
 
+  // Estado
   documentId!: string;
 
   document?: Document;
@@ -28,52 +33,45 @@ export class DocumentViewComponent implements OnInit {
 
   loading = false;
 
+  // Lifecycle
   ngOnInit(): void {
     this.documentId = this.route.snapshot.paramMap.get('id')!;
     this.loadData();
   }
 
+  // Carregar dados
   private loadData(): void {
     this.loading = true;
 
-    this.documentService.findById(this.documentId).subscribe({
-      next: (doc) => {
+    this.documentService.findById(this.documentId).pipe(
+
+      switchMap((doc) => {
         this.document = doc;
 
-        this.versionService.getLatestVersionMetadata(this.documentId).subscribe({
-          next: (version) => {
-            this.latestVersion = version;
-            this.loading = false;
+        return this.versionService.getLatestVersionMetadata(this.documentId).pipe(
 
-            this.cdr.detectChanges();
+          catchError(() => {
+            // Documento sem versão → caso normal
+            this.latestVersion = undefined;
+            return of(null);
+          })
+        );
+      })
+    ).subscribe({
+      next: (version) => {
+        this.latestVersion = version ?? undefined;
+        this.loading = false;
 
-            console.log(this.document);
-            console.log(this.latestVersion);
-            console.log(this.loading);
-          },
-          error: (err) => {
-            this.loading = false;
-
-            if (err.status === 404) {
-              // NÃO TEM VERSÃO → CASO NORMAL
-              this.latestVersion = undefined;
-              return;
-            }
-
-            console.error(err);
-
-            console.log(this.latestVersion);
-            console.log(this.loading);
-          }
-        });
+        this.cdr.detectChanges();
       },
+
       error: () => {
-        this.document = undefined;
         this.loading = false;
       }
     });
   }
 
+  // Download
   downloadLatest(): void {
     this.versionService.downloadLatestVersion(this.documentId).subscribe({
       next: (res) => {
@@ -94,6 +92,9 @@ export class DocumentViewComponent implements OnInit {
         a.click();
 
         window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Erro ao baixar arquivo:', err);
       }
     });
   }
