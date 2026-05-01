@@ -17,6 +17,9 @@ Thumbs.db
 # ========================
 *.log
 logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # ========================
 # DOCKER
@@ -24,14 +27,14 @@ logs/
 docker/*.log
 
 # ========================
-# IDEs
+# IDEs / EDITORS
 # ========================
 .vscode/
 .idea/
 *.iml
 
 # ========================
-# TEMP FILES
+# TEMP / CACHE
 # ========================
 tmp/
 temp/
