@@ -1,0 +1,47 @@
+.btn-fixed {
+  min-width: 180px;
+}
+
+/* 🔥 controla a linha da tabela */
+.version-detail-row {
+  height: 0;
+}
+
+/* remove espaçamento da célula */
+.version-detail-row td {
+  padding: 0 !important;
+  border: none;
+}
+
+/* container animado */
+.version-detail-anim {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: max-height 0.3s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* ABRINDO */
+.version-detail-row.show {
+  height: auto;
+}
+
+.version-detail-row.show .version-detail-anim {
+  max-height: 300px;
+  opacity: 1;
+  transform: translateY(0);
+  padding: 1rem;
+}
+
+/* 🔥 FECHANDO (ESSA É A CHAVE) */
+.version-detail-row.closing {
+  height: 0;
+}
+
+.version-detail-row.closing .version-detail-anim {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-5px);
+  padding: 0;
+}

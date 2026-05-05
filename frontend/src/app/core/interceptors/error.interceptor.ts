@@ -39,7 +39,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                 errorMessage = 'Erro interno no servidor. Tente novamente mais tarde.';
             }
 
-            return throwError(() => new Error(errorMessage));
+            return throwError(() => ({
+                ...error,
+                userMessage: errorMessage
+            }));
         })
     );
 };

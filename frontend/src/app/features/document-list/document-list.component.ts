@@ -278,7 +278,7 @@ export class DocumentListComponent implements OnInit {
   }
 
   deleteDocument(event: Event, documentId: string): void {
-    if (!confirm('Confirma exclusão do documento?')) return;
+    if (!confirm('Confirma a exclusão do documento?')) return;
 
     this.documentService.delete(documentId).subscribe({
       next: () => {
