@@ -37,7 +37,7 @@ export class DocumentVersionService {
   /**
    * Busca os metadados detalhados de uma versão específica.
    */
-  getVersionMetadata(documentId: string, version: number): Observable<DocumentVersionMetadata> {
+  getVersionMetadata(documentId: string, version: string): Observable<DocumentVersionMetadata> {
     return this.http.get<DocumentVersionMetadata>(
       `${this.apiUrl}/${documentId}/versions/${version}/metadata`
     );

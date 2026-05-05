@@ -9,28 +9,14 @@
     <!-- CONTEÚDO -->
     <div *ngIf="!loading && document">
 
-        <!-- HEADER -->
-        <div class="card mb-3 shadow-sm">
-            <div class="card-body d-flex justify-content-between align-items-center">
-
-                <div>
-                    <h4 class="mb-0">Documento</h4>
-                    <small class="text-muted">ID: {{ document.id }}</small>
-                </div>
-
-                <button class="btn btn-outline-primary btn-sm" (click)="downloadLatest()" [disabled]="!latestVersion">
-                    <i class="bi bi-download"></i>
-                    Baixar versão atual
-                </button>
-
-            </div>
-        </div>
-
-        <!-- METADADOS -->
+        <!-- DOCUMENTO -->
         <div class="card shadow-sm">
+
             <div class="card-header">
-                <h6 class="text-info-emphasis">DADOS</h6>
+                <h4 class="text-info-emphasis">Documento</h4>
+                <small class="text-muted">ID: {{ document.id }}</small>
             </div>
+
             <div class="card-body">
 
                 <div class="row g-3">
@@ -92,16 +78,39 @@
                 </div>
 
             </div>
+
         </div>
 
-        <!-- ÚLTIMA VERSÃO -->
+        <!-- VERSÃO ATUAL -->
         <div class="card mt-3 shadow-sm" *ngIf="latestVersion">
-            <div class="card-header">
-                <h6 class="text-info-emphasis">VERSÃO ATUAL Nº: {{ latestVersion.version }}</h6>
+
+            <div class="card-header d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2">
+
+                <h6 class="text-info-emphasis mb-0 flex-grow-1">
+                    <strong>Versão atual</strong>
+                </h6>
+
+                <button class="btn btn-outline-primary btn-sm px-3 btn-fixed" (click)="downloadLatest()"
+                    [disabled]="!latestVersion">
+                    <i class="bi bi-download me-1"></i>
+                    Baixar versão atual
+                </button>
+
             </div>
+
             <div class="card-body">
 
                 <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="small text-muted">ID</label>
+                        <div>{{ latestVersion.id }}</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="small text-muted">Versão nº</label>
+                        <div>{{ latestVersion.version }}</div>
+                    </div>
 
                     <div class="col-md-6">
                         <label class="small text-muted">Arquivo</label>
@@ -126,10 +135,142 @@
                 </div>
 
             </div>
+
+        </div>
+
+        <!-- LISTA DE VERSÕES -->
+        <div class="card mt-3 shadow-sm" *ngIf="versions.length">
+
+            <div class="card-header d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2">
+
+                <h6 class="text-info-emphasis mb-0 flex-grow-1">
+                    <strong>Lista de versões</strong>
+                </h6>
+
+                <button class="btn btn-success btn-sm px-3 btn-fixed" (click)="uploadNewVersion()"
+                    [disabled]="!latestVersion">
+                    <i class="bi bi-plus-lg me-1"></i>
+                    Nova versão
+                </button>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+
+                        <thead>
+                            <tr>
+                                <th style="width: 120px;">ID</th>
+                                <th>Versão</th>
+                                <th>Arquivo</th>
+                                <th>Criado em</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <ng-container *ngFor="let v of versions">
+
+                                <!-- LINHA NORMAL -->
+                                <tr [class.table-active]="v === selectedVersion">
+
+                                    <td>
+                                        <code class="badge bg-danger" [title]="v.id">{{ v.id | shortId }}</code>
+                                    </td>
+
+                                    <td>{{ v.version }}</td>
+                                    <td>{{ v.fileName }}</td>
+                                    <td>{{ v.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm">
+
+                                            <!-- TOGGLE -->
+                                            <button class="btn btn-outline-primary" (click)="selectVersion(v)"
+                                                [title]="v === selectedVersion ? 'Fechar detalhes' : 'Ver detalhes'">
+                                                <i class="bi"
+                                                    [ngClass]="v === selectedVersion ? 'bi-eye-slash' : 'bi-eye'">
+                                                </i>
+                                            </button>
+
+                                            <!-- DOWNLOAD -->
+                                            <button class="btn btn-outline-success" (click)="downloadVersion(v.version)"
+                                                title="Baixar">
+                                                <i class="bi bi-download"></i>
+                                            </button>
+
+                                            <!-- DELETE -->
+                                            <button class="btn btn-outline-danger" (click)="deleteVersion(v.version)"
+                                                title="Excluir">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                                <!-- LINHA EXPANDIDA (🔥 CORRETA) -->
+                                <tr *ngIf="v === selectedVersion || v === closingVersion" class="version-detail-row"
+                                    [class.show]="v === selectedVersion" [class.closing]="v === closingVersion">
+
+                                    <td colspan="5">
+
+                                        <div class="version-detail-anim bg-light border rounded">
+
+                                            <div class="p-3">
+
+                                                <div class="row g-3">
+
+                                                    <div class="col-md-12">
+                                                        <label class="small text-muted">ID</label>
+                                                        <div>{{ v.id }}</div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="small text-muted">Arquivo</label>
+                                                        <div>{{ v.fileName }}</div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="small text-muted">Tipo</label>
+                                                        <div>{{ v.contentType }}</div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="small text-muted">Tamanho</label>
+                                                        <div>{{ v.size | number }} bytes</div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="small text-muted">Criado em</label>
+                                                        <div>{{ v.createdAt | date:'dd/MM/yyyy HH:mm' }}</div>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            </ng-container>
+                        </tbody>
+
+                    </table>
+                </div>
+
+            </div>
+
         </div>
 
         <!-- QUANDO NÃO TEM VERSÃO -->
-        <div class="card mt-3 shadow-sm" *ngIf="!latestVersion">
+        <div class="card mt-3 shadow-sm" *ngIf="!versions.length">
             <div class="card-body text-muted text-center">
                 Nenhuma versão disponível para este documento.
             </div>
